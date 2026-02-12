@@ -7,44 +7,18 @@
 # runtime container
 FROM docker.io/debian:bookworm-slim
 
-# install some packages
+# install PHP 8.2 (Debian bookworm default), extensions, and Node.js
 RUN set -exu \
   && DEBIAN_FRONTEND=noninteractive apt-get -yq update \
   && DEBIAN_FRONTEND=noninteractive apt-get -yq install \
-    libjpeg-dev \
-    libpng-dev \
-    libfreetype6-dev \
-    software-properties-common \
-    ca-certificates \
-    lsb-release \
-    apt-transport-https \
-    curl
-
-# setup nodejs repo
-RUN set -exu \
-  && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | gpg --dearmor | apt-key add - \
-  && echo "deb https://deb.nodesource.com/node_14.x bookworm main" | tee /etc/apt/sources.list.d/nodesource.list
-
-# setup php8.0 repo
-RUN set -exu \
-  && echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list \
-  && curl -fsSL https://packages.sury.org/php/apt.gpg | apt-key add -
-
-# install php5.6, some extensions, and nodejs
-RUN set -exu \
-  && DEBIAN_FRONTEND=noninteractive apt-get -yq update \
-  && DEBIAN_FRONTEND=noninteractive apt-get -yq install \
-    php8.0 \
-    php8.0-fpm \
-    php8.0-mysqli \
-    php8.0-mysql \
-    php8.0-exif \
-    php8.0-gd \
+    php \
+    php-fpm \
+    php-mysqli \
+    php-mysql \
+    php-exif \
+    php-gd \
     nodejs \
-    npm
-
-# clean apt caches
-RUN set -exu \
+    npm \
   && DEBIAN_FRONTEND=noninteractive apt-get -yq clean
 
 # create a builder user
@@ -83,4 +57,4 @@ RUN set -exu \
 
 # Expose port 9000 and start php-fpm server
 EXPOSE 9000
-CMD ["/usr/sbin/php-fpm8.0", "--nodaemonize", "--force-stderr"]
+CMD ["php-fpm8.2", "--nodaemonize", "--force-stderr"]

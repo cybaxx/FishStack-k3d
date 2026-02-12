@@ -53,7 +53,7 @@ spec:
       # Init container to sync wwwroot files
       initContainers:
       - name: sync-wwwroot
-        image: ghcr.io/cybaxx/web-services-k8s/wiki:latest-php
+        image: wetfish-registry:5000/wiki:php
         command: ['sh', '-c', 'cp -rn /var/www/. /data/ || true']
         volumeMounts:
         - name: wwwroot
@@ -62,7 +62,7 @@ spec:
       containers:
       # Nginx container
       - name: nginx
-        image: ghcr.io/cybaxx/web-services-k8s/wiki:latest-nginx
+        image: wetfish-registry:5000/wiki:nginx
         ports:
         - containerPort: 80
           name: http
@@ -96,7 +96,7 @@ spec:
 
       # PHP-FPM container (sidecar)
       - name: php-fpm
-        image: ghcr.io/cybaxx/web-services-k8s/wiki:latest-php
+        image: wetfish-registry:5000/wiki:php
         ports:
         - containerPort: 9000
           name: php-fpm
@@ -143,10 +143,10 @@ spec:
             cpu: "500m"
         volumeMounts:
         - name: php-config
-          mountPath: /usr/local/etc/php/php.ini
+          mountPath: /etc/php/8.2/fpm/php.ini
           subPath: php.ini
         - name: php-config
-          mountPath: /usr/local/etc/php-fpm.d/www.conf
+          mountPath: /etc/php/8.2/fpm/pool.d/www.conf
           subPath: php-fpm-pool.conf
         - name: wwwroot
           mountPath: /var/www

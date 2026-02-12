@@ -12,12 +12,18 @@ Kubernetes migration of wetfish web-services from Docker Compose to a k3d cluste
 3. **Scale Out** - Remaining services (forum, home, danger, click), multi-env, GitOps
 
 ### Current Status
-- Wiki service k8s manifests complete (sidecar pattern: nginx + php-fpm)
+- Wiki service **running in k3d cluster** (verified: Traefik ingress routing works)
 - GitHub Actions CI/CD workflows in place
-- Infrastructure configs done (Traefik, namespaces)
-- Monitoring Helm values created (not yet deployed)
+- Infrastructure deployed (Traefik, namespaces)
+- Monitoring Helm values created (not yet deployed to cluster)
 - Scripts complete (setup, deploy, cleanup, hosts, testing)
-- **Not yet tested on a live cluster** - next step is `setup-dev.sh` → build images → deploy → validate
+
+### Known Issues & Lessons Learned
+- Dockerfiles use Debian bookworm default packages (PHP 8.2, Node 18) - NodeSource/Sury repos removed (EOL/broken GPG keys)
+- MySQL deployment uses `strategy: Recreate` (required for RWO PVCs)
+- MySQL `sql_mode = ""` needed for legacy PHP code that passes `'NULL'` strings for auto-increment
+- DB schema must be loaded manually on first deploy: `kubectl exec -i deployment/wiki-mysql -n wetfish-dev -- mysql -uroot -pwikipass wikidb < services/wiki/config/schema.sql`
+- If k3d agent nodes show NotReady, restart them: `docker restart k3d-wetfish-dev-agent-0 k3d-wetfish-dev-agent-1`
 
 ## Key Commands
 
@@ -28,6 +34,14 @@ Kubernetes migration of wetfish web-services from Docker Compose to a k3d cluste
 sudo ./scripts/setup-hosts.sh   # Add service DNS entries to /etc/hosts
 k3d cluster start wetfish-dev   # Start existing cluster
 k3d cluster stop wetfish-dev    # Stop cluster
+```
+
+### Building Images (dev)
+```bash
+docker build -t localhost:5000/wiki:nginx -f services/wiki/Dockerfile.nginx services/wiki/
+docker build -t localhost:5000/wiki:php -f services/wiki/Dockerfile.php services/wiki/
+docker push localhost:5000/wiki:nginx
+docker push localhost:5000/wiki:php
 ```
 
 ### Deploying Services
@@ -78,7 +92,8 @@ Each service lives under `services/<name>/` with:
 - **Stack**: Custom PHP application (in `wwwroot/`) - NOT MediaWiki
 - **Architecture**: Nginx and PHP-FPM run as sidecar containers in the same pod (`wiki-web` deployment)
 - **Database**: MariaDB 10.10 (`wiki-mysql` deployment)
-- **Images**: `ghcr.io/cybaxx/web-services-k8s/wiki:latest-nginx` and `:latest-php`
+- **Images (dev)**: `wetfish-registry:5000/wiki:nginx` and `:php` (local k3d registry)
+- **Images (CI/CD)**: `ghcr.io/cybaxx/web-services-k8s/wiki:latest-nginx` and `:latest-php`
 - **ConfigMaps**: nginx.conf, php.ini, php-fpm-pool.conf embedded in `k8s/01-configmap.yaml`
 - **Storage**: PVCs for wwwroot (2Gi) and uploads (5Gi)
 - **Access**: `http://wiki.wetfish.local` (requires /etc/hosts entry)
@@ -109,5 +124,5 @@ Detailed docs live in `docs/`:
 ## Important Conventions
 - All scripts auto-detect PROJECT_DIR from their location (no hardcoded paths)
 - K8s manifests are numbered for ordered application (01-, 02-, etc.)
-- The old `services/wiki/kubernetes/` directory was removed; use `services/wiki/k8s/` only
-- Wiki service `.github/workflows/` in the service dir are the originals; the active copies are at repo root `.github/workflows/`
+- Active GitHub Actions workflows are at repo root `.github/workflows/`; copies in `services/wiki/.github/workflows/` are the originals
+- Dev images go to local k3d registry (`localhost:5000`); k8s manifests reference `wetfish-registry:5000` (cluster-internal name)

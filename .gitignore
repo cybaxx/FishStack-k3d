@@ -37,3 +37,10 @@ temp/
 
 # Helm charts (if used)
 charts/*.tgz
+
+# Claude Code local config
+.claude
+
+# Generated docs
+IMPLEMENTATION_SUMMARY.md
+VERIFICATION_CHECKLIST.md

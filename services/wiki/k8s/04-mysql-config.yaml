@@ -13,6 +13,9 @@ data:
     default-storage-engine = INNODB
     character-set-server = utf8mb4
     collation-server = utf8mb4_unicode_ci
+
+    # Permissive SQL mode for legacy PHP app (passes 'NULL' strings for auto-increment)
+    sql_mode = ""
     
     # Performance settings for small deployment
     innodb_buffer_pool_size = 128M
