@@ -1,0 +1,41 @@
+# NOTE: Requires prometheus-operator CRDs (ServiceMonitor).
+# Install prometheus-operator before applying this manifest.
+# deploy.sh will skip this gracefully if CRDs are not installed.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: wiki-web-metrics
+  namespace: wetfish-dev
+  labels:
+    app: wiki
+    component: web
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: wiki
+      component: web
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+    scrapeTimeout: 10s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: wiki-mysql-metrics
+  namespace: wetfish-dev
+  labels:
+    app: wiki
+    component: mysql
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: wiki
+      component: mysql
+  endpoints:
+  - port: mysql
+    interval: 30s
+    scrapeTimeout: 10s

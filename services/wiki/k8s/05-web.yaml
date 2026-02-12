@@ -1,0 +1,196 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wiki-uploads-pvc
+  namespace: wetfish-dev
+  labels:
+    app: wiki
+    component: web
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: local-path
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wiki-wwwroot-pvc
+  namespace: wetfish-dev
+  labels:
+    app: wiki
+    component: web
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: local-path
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wiki-web
+  namespace: wetfish-dev
+  labels:
+    app: wiki
+    component: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wiki
+      component: web
+  template:
+    metadata:
+      labels:
+        app: wiki
+        component: web
+    spec:
+      # Init container to sync wwwroot files
+      initContainers:
+      - name: sync-wwwroot
+        image: ghcr.io/cybaxx/web-services-k8s/wiki:latest-php
+        command: ['sh', '-c', 'cp -rn /var/www/. /data/ || true']
+        volumeMounts:
+        - name: wwwroot
+          mountPath: /data
+
+      containers:
+      # Nginx container
+      - name: nginx
+        image: ghcr.io/cybaxx/web-services-k8s/wiki:latest-nginx
+        ports:
+        - containerPort: 80
+          name: http
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: nginx.conf
+        - name: wwwroot
+          mountPath: /var/www
+        - name: uploads
+          mountPath: /var/www/upload
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+      # PHP-FPM container (sidecar)
+      - name: php-fpm
+        image: ghcr.io/cybaxx/web-services-k8s/wiki:latest-php
+        ports:
+        - containerPort: 9000
+          name: php-fpm
+        env:
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: wiki-mysql-secret
+              key: mysql-user
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: wiki-mysql-secret
+              key: mysql-password
+        - name: DB_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: wiki-mysql-secret
+              key: mysql-database
+        - name: DB_HOSTNAME
+          value: "wiki-mysql.wetfish-dev.svc.cluster.local"
+        - name: SITE_URL
+          value: "https://wiki.wetfish.local"
+        - name: INTERNAL_HOSTNAME
+          value: "wiki-web"
+        - name: ALLOWED_EMBEDS
+          value: ""
+        - name: LOGIN_PASSWORD
+          value: "changeme"
+        - name: ADMIN_PASSWORD
+          value: "changeme"
+        - name: BAN_PASSWORD
+          value: "changeme"
+        - name: CAPTCHA_BYPASS
+          value: "changeme"
+        - name: BANLIST
+          value: ""
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        volumeMounts:
+        - name: php-config
+          mountPath: /usr/local/etc/php/php.ini
+          subPath: php.ini
+        - name: php-config
+          mountPath: /usr/local/etc/php-fpm.d/www.conf
+          subPath: php-fpm-pool.conf
+        - name: wwwroot
+          mountPath: /var/www
+        - name: uploads
+          mountPath: /var/www/upload
+        livenessProbe:
+          tcpSocket:
+            port: 9000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: 9000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: wiki-nginx-config
+      - name: php-config
+        configMap:
+          name: wiki-php-config
+      - name: wwwroot
+        persistentVolumeClaim:
+          claimName: wiki-wwwroot-pvc
+      - name: uploads
+        persistentVolumeClaim:
+          claimName: wiki-uploads-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wiki-web
+  namespace: wetfish-dev
+  labels:
+    app: wiki
+    component: web
+spec:
+  selector:
+    app: wiki
+    component: web
+  ports:
+  - port: 80
+    targetPort: 80
+    name: http
+  type: ClusterIP

@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wiki-mysql
+  namespace: wetfish-dev
+  labels:
+    app: wiki
+    component: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wiki
+      component: database
+  template:
+    metadata:
+      labels:
+        app: wiki
+        component: database
+    spec:
+      containers:
+      - name: mysql
+        image: mariadb:10.10
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: wiki-secrets
+              key: MYSQL_ROOT_PASSWORD
+        - name: MYSQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: wiki-secrets
+              key: MYSQL_DATABASE
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: wiki-secrets
+              key: MYSQL_USER
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: wiki-secrets
+              key: MYSQL_PASSWORD
+        ports:
+        - name: mysql
+          containerPort: 3306
+        volumeMounts:
+        - name: mysql-data
+          mountPath: /var/lib/mysql
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          exec:
+            command:
+            - mysqladmin
+            - ping
+            - -h
+            - localhost
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+            - mysql
+            - -h
+            - localhost
+            - -e
+            - "SELECT 1"
+          initialDelaySeconds: 5
+          periodSeconds: 2
+      volumes:
+      - name: mysql-data
+        persistentVolumeClaim:
+          claimName: wiki-data-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wiki-mysql
+  namespace: wetfish-dev
+  labels:
+    app: wiki
+    component: database
+spec:
+  selector:
+    app: wiki
+    component: database
+  ports:
+  - name: mysql
+    port: 3306
+    targetPort: 3306
+  type: ClusterIP

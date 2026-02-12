@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wiki-php
+  namespace: wetfish-dev
+  labels:
+    app: wiki
+    component: php
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wiki
+      component: php
+  template:
+    metadata:
+      labels:
+        app: wiki
+        component: php
+    spec:
+      containers:
+      - name: php-fpm
+        image: ghcr.io/wetfish/wiki:prod-php
+        ports:
+        - containerPort: 9000
+          name: php-fpm
+        envFrom:
+        - configMapRef:
+            name: wiki-config
+        env:
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: wiki-secrets
+              key: db-password
+        - name: LOGIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: wiki-secrets
+              key: login-password
+        - name: ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: wiki-secrets
+              key: admin-password
+        - name: BAN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: wiki-secrets
+              key: ban-password
+        volumeMounts:
+        - name: wiki-uploads
+          mountPath: /var/www/upload
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "400m"
+        livenessProbe:
+          tcpSocket:
+            port: 9000
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        readinessProbe:
+          tcpSocket:
+            port: 9000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+      volumes:
+      - name: wiki-uploads
+        persistentVolumeClaim:
+          claimName: wiki-uploads
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wiki-php
+  namespace: wetfish-dev
+  labels:
+    app: wiki
+    component: php
+spec:
+  selector:
+    app: wiki
+    component: php
+  ports:
+  - name: php-fpm
+    port: 9000
+    targetPort: 9000
+  type: ClusterIP

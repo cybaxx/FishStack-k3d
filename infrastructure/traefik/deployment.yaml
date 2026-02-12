@@ -23,29 +23,27 @@ spec:
         image: traefik:v2.11
         args:
           - "--api.insecure=true"
-          - "--providers.kubernetescrd"
+          - "--providers.kubernetesingress"
           - "--entrypoints.web.address=:80"
           - "--entrypoints.websecure.address=:443"
           - "--entrypoints.traefik.address=:8080"
+          - "--ping"
           - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
           - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
           - "--certificatesresolvers.letsencrypt.acme.email=letsencrypt@wetfish.net"
-          - "--certificatesresolvers.letsencrypt.acme.storage=/acme.json"
+          - "--certificatesresolvers.letsencrypt.acme.storage=/acme/acme.json"
         ports:
         - name: web
           containerPort: 80
-          hostPort: 80
         - name: websecure
           containerPort: 443
-          hostPort: 443
         - name: traefik
           containerPort: 8080
         - name: metrics
           containerPort: 8082
         volumeMounts:
         - name: acme-storage
-          mountPath: /acme.json
-          subPath: acme.json
+          mountPath: /acme
         resources:
           requests:
             memory: "128Mi"
@@ -113,9 +111,9 @@ rules:
 - apiGroups: ["extensions", "networking.k8s.io"]
   resources: ["ingresses", "ingressclasses"]
   verbs: ["get", "list", "watch"]
-- apiGroups: ["traefik.io"]
-  resources: ["ingressroutes", "middlewares", "services"]
-  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["extensions", "networking.k8s.io"]
+  resources: ["ingresses/status"]
+  verbs: ["update"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding

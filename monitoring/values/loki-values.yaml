@@ -1,0 +1,84 @@
+# Loki Helm values
+# Loki is a log aggregation system designed to work with Grafana
+
+# Deployment mode
+deploymentMode: SingleBinary
+
+loki:
+  # Authentication
+  auth_enabled: false
+
+  # Common configuration
+  commonConfig:
+    replication_factor: 1
+    path_prefix: /var/loki
+
+  # Storage configuration
+  storage:
+    type: filesystem
+    filesystem:
+      chunks_directory: /var/loki/chunks
+      rules_directory: /var/loki/rules
+
+  # Schema configuration
+  schemaConfig:
+    configs:
+    - from: 2024-01-01
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h
+
+# Single binary deployment
+singleBinary:
+  replicas: 1
+
+  # Resource limits
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+  # Persistence
+  persistence:
+    enabled: true
+    size: 20Gi
+    storageClass: local-path
+
+# Monitoring
+monitoring:
+  selfMonitoring:
+    enabled: false
+    grafanaAgent:
+      installOperator: false
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 3100
+
+# Ingress
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  hosts:
+    - host: loki.wetfish.local
+      paths:
+        - path: /
+          pathType: Prefix
+
+# Gateway (for multi-tenant mode, disabled in single binary)
+gateway:
+  enabled: false
+
+# Promtail (log collector)
+promtail:
+  enabled: true
+  config:
+    clients:
+      - url: http://loki:3100/loki/api/v1/push

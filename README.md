@@ -9,7 +9,7 @@
 This project migrates the wetfish web-services from Docker Compose to Kubernetes with:
 - **Infrastructure**: On-prem k3d cluster for development
 - **Ingress**: Traefik v2 with Cloudflare integration
-- **Pilot Service**: Wiki (MediaWiki + MariaDB)
+- **Pilot Service**: Wiki (custom PHP application with nginx + php-fpm + MariaDB)
 - **Monitoring**: Full observability stack (Prometheus, Grafana, Loki, Tempo)
 - **CI/CD**: GitHub Actions with GHCR container registry
 
@@ -44,6 +44,7 @@ Applications → Metrics → Prometheus → Alertmanager → IRC/Webhook
 - Docker Desktop or Docker Engine
 - k3d (Kubernetes)
 - kubectl
+- helm (Kubernetes package manager)
 - GitHub CLI (for authentication)
 
 ### **1. Setup Development Environment**
@@ -55,15 +56,21 @@ git checkout dev-init-1
 
 # Setup k3d cluster and dependencies
 ./scripts/setup-dev.sh
+
+# Setup DNS entries for local access
+sudo ./scripts/setup-hosts.sh
 ```
 
 ### **2. Deploy Wiki Service**
 ```bash
-# Deploy wiki application with monitoring
+# Deploy wiki application
 ./scripts/deploy.sh wetfish-dev wiki
 
 # Wait for rollout
-kubectl rollout status deployment/wiki -n wetfish-dev
+kubectl rollout status deployment/wiki-web -n wetfish-dev
+
+# Run health checks
+./scripts/test-deployment.sh wetfish-dev wiki
 ```
 
 ### **3. Access Services**
@@ -165,16 +172,25 @@ kubectl get namespaces
 # Deploy services
 ./scripts/deploy.sh wetfish-dev wiki
 
+# Run health checks
+./scripts/test-deployment.sh wetfish-dev wiki
+
 # Check deployment status
 kubectl get pods -n wetfish-dev
 kubectl get services -n wetfish-dev
 kubectl get ingress -n wetfish-dev
 
-# View logs
-kubectl logs deployment/wiki -n wetfish-dev -f
+# View logs (nginx container)
+kubectl logs deployment/wiki-web -n wetfish-dev -c nginx -f
 
-# Access container shell
-kubectl exec -it deployment/wiki -n wetfish-dev -- bash
+# View logs (php-fpm container)
+kubectl logs deployment/wiki-web -n wetfish-dev -c php-fpm -f
+
+# Access container shell (nginx)
+kubectl exec -it deployment/wiki-web -n wetfish-dev -c nginx -- sh
+
+# Access container shell (php-fpm)
+kubectl exec -it deployment/wiki-web -n wetfish-dev -c php-fpm -- bash
 ```
 
 ### **Monitoring Access**

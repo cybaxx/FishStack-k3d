@@ -9,15 +9,15 @@
 ### **High-Level Design**
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    k3d Cluster Environment                   │
+│                    k3d Cluster Environment                      │
 ├─────────────────────────────────────────────────────────────────┤
-│  wetfish-system    │  wetfish-dev  │ wetfish-monitoring       │
-│  (Traefik)        │  (Services)   │  (Observability)        │
-│  ├─ Ingress       │  ├─ Wiki      │  ├─ Prometheus           │
-│  ├─ CertManager   │  ├─ Forum     │  ├─ Grafana              │
-│  └─ DNS           │  ├─ Home      │  ├─ Loki                 │
-│                   │  ├─ Danger    │  ├─ Tempo                │
-│                   │  └─ Click     │  └─ AlertManager        │
+│  wetfish-system   │  wetfish-dev  │ wetfish-monitoring          │
+│  (Traefik)        │  (Services)   │  (Observability)            │
+│  ├─ Ingress       │  ├─ Wiki      │  ├─ Prometheus              │
+│  ├─ CertManager   │  ├─ Forum     │  ├─ Grafana                 │
+│  └─ DNS           │  ├─ Home      │  ├─ Loki                    │
+│                   │  ├─ Danger    │  ├─ Tempo                   │
+│                   │  └─ Click     │  └─ AlertManager            │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -35,22 +35,22 @@ Docker Compose → Kubernetes → Production K8s
 ### **Cluster Networking**
 ```
 ┌─────────────────────────────────────────────────────┐
-│                  k3d Cluster                      │
+│                  k3d Cluster                        │
 ├─────────────────────────────────────────────────────┤
-│  Load Balancer (Port 8080/8443)                  │
-│         │                                         │
-│  ┌─────▼─────┐                                   │
-│  │  Traefik  │ ← Ingress Controller              │
-│  │  Ingress  │   - HTTP/HTTPS termination        │
-│  └─────┬─────┘   - SSL certificates             │
-│         │                                       │
-│  ┌──────▼───────┐                               │
-│  │  Namespaces │                               │
-│  ├─────────────┤                               │
-│  │ wetfish-dev │ ← Application Services        │
-│  │ monitoring  │ ← Observability Stack        │
-│  │ system      │ ← Core Infrastructure         │
-│  └─────────────┘                               │
+│  Load Balancer (Port 8080/8443)                     │
+│         │                                           │
+│  ┌─────▼─────┐                                      │
+│  │  Traefik  │ ← Ingress Controller                 │
+│  │  Ingress  │   - HTTP/HTTPS termination           │
+│  └─────┬─────┘   - SSL certificates                 │
+│         │                                           │
+│  ┌──────▼───────┐                                   │
+│  │  Namespaces  │                                   │
+│  ├─────────────┤                                    │
+│  │ wetfish-dev │ ← Application Services             │
+│  │ monitoring  │ ← Observability Stack              │
+│  │ system      │ ← Core Infrastructure              │
+│  └─────────────┘                                    │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -104,17 +104,18 @@ Resources:
 ```yaml
 Purpose: Development applications
 Components:
-  - Wiki (MediaWiki + MariaDB)
-  - Forum (Node.js + PostgreSQL)
-  - Home (Static site)
-  - Danger (JavaScript sandbox)
-  - Click (Click tracking)
+  - Wiki (Custom PHP app with nginx + php-fpm sidecar + MariaDB)
+  - Forum (Node.js + PostgreSQL) - Future
+  - Home (Static site) - Future
+  - Danger (JavaScript sandbox) - Future
+  - Click (Click tracking) - Future
 
 Resources:
-  - Deployments: Application containers
+  - Deployments: Application containers (sidecar pattern)
   - Services: Internal communication
-  - PersistentVolumes: Database storage
-  - ConfigMaps: Configuration management
+  - PersistentVolumes: Database storage, uploads, wwwroot
+  - ConfigMaps: nginx.conf, php.ini, php-fpm pool config
+  - Secrets: Database credentials, application passwords
 ```
 
 ---
@@ -123,17 +124,17 @@ Resources:
 
 ### **Application Flow**
 ```
-┌──────────┐    HTTP/HTTPS    ┌──────────┐    Service    ┌──────────┐
-│  User    │ ────────────────► │ Traefik  │ ───────────► │  Wiki    │
-│ Request  │                 │ Ingress  │             │ Service  │
-└──────────┘                 └────┬─────┘             └────┬─────┘
-                                   │                           │
+┌──────────┐    HTTP/HTTPS     ┌──────────┐    Service  ┌──────────┐
+│  User    │ ────────────────► │ Traefik  │ ───────────►│  Wiki    │
+│ Request  │                   │ Ingress  │             │ Service  │
+└──────────┘                   └────┬─────┘             └────┬─────┘
+                                    │                        │
                                ┌───▼───────────────────────▼───┐
                                │        Metrics Export         │
                                └───────────┬───────────────────┘
                                            │
                                    ┌───────▼───────┐
-                                   │   Prometheus   │
+                                   │   Prometheus  │
                                    │    Scrapes    │
                                    └───────┬───────┘
                                            │
@@ -247,10 +248,10 @@ Grafana Dashboards:
 ### **CI/CD Pipeline**
 ```
 GitHub Repository → GitHub Actions → Container Build → GHCR Push → k3d Deploy
-                                    │                │                │
+                                    │              │             │
                             ┌───────▼───────┐ ┌────▼────┐ ┌──────▼──────┐
                             │  Build/Test   │ │ Registry│ │  Deploy     │
-                            │  Lint/Scan    │ │ Push    │ │  Verify    │
+                            │  Lint/Scan    │ │ Push    │ │  Verify     │
                             └───────────────┘ └─────────┘ └─────────────┘
 ```
 
