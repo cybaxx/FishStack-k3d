@@ -4,7 +4,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Kubernetes migration of wetfish web-services from Docker Compose to a k3d cluster with full observability (Prometheus, Grafana, Loki, Tempo). Currently in foundation phase with the wiki (custom PHP application) service as the pilot migration.
+Kubernetes migration of wetfish web-services from Docker Compose to a k3d cluster with full observability (Prometheus, Grafana, Loki, Tempo). Currently in Phase 1 (Foundation) with the wiki service as the pilot migration.
+
+### Migration Phases
+1. **Foundation (current)** - Wiki pilot, k3d cluster, CI/CD, monitoring stack
+2. **Production Ready** - Production cluster, security hardening, backups
+3. **Scale Out** - Remaining services (forum, home, danger, click), multi-env, GitOps
+
+### Current Status
+- Wiki service k8s manifests complete (sidecar pattern: nginx + php-fpm)
+- GitHub Actions CI/CD workflows in place
+- Infrastructure configs done (Traefik, namespaces)
+- Monitoring Helm values created (not yet deployed)
+- Scripts complete (setup, deploy, cleanup, hosts, testing)
+- **Not yet tested on a live cluster** - next step is `setup-dev.sh` → build images → deploy → validate
 
 ## Key Commands
 
@@ -31,7 +44,8 @@ k3d cluster stop wetfish-dev    # Stop cluster
 ```bash
 ./scripts/test-deployment.sh wetfish-dev wiki  # Run health checks
 kubectl get pods -n wetfish-dev
-kubectl logs deployment/wiki-web -n wetfish-dev -f
+kubectl logs deployment/wiki-web -n wetfish-dev -c nginx -f
+kubectl logs deployment/wiki-web -n wetfish-dev -c php-fpm -f
 kubectl exec -it deployment/wiki-web -n wetfish-dev -c php-fpm -- bash
 kubectl port-forward svc/grafana 3000:3000 -n wetfish-monitoring
 ```
@@ -51,35 +65,49 @@ Each service lives under `services/<name>/` with:
 - `docker-compose*.yml` - Docker Compose variants (dev, staging, prod)
 
 ### Infrastructure
-- **Cluster**: k3d with built-in Traefik disabled (`--k3s-arg '--disable=traefik'`); custom Traefik v2.11 deployed separately
+- **Cluster**: k3d with built-in Traefik disabled (`--k3s-arg '--disable=traefik'`); custom Traefik v2.11 deployed via raw manifests in `infrastructure/traefik/`
 - **Ports**: HTTP 8080 -> 80, HTTPS 8443 -> 443 on the load balancer
 - **Registry**: Local k3d registry on port 5000 for dev; GHCR (`ghcr.io/cybaxx/web-services-k8s`) for CI/CD
 - **Storage**: k3d local-path storage class (dev only)
-- **DNS**: Requires `/etc/hosts` entries (e.g., `127.0.0.1 wiki.wetfish.local`)
+- **DNS**: Requires `/etc/hosts` entries managed by `scripts/setup-hosts.sh`
 
 ### Deploy Script Behavior
-`scripts/deploy.sh` applies manifests from `services/<name>/k8s/*.yaml` in alphabetical order, waits for rollout (300s timeout), then shows status. For `monitoring` and `traefik` services, it uses Helm instead of raw manifests.
+`scripts/deploy.sh` applies manifests from `services/<name>/k8s/*.yaml` in alphabetical order, waits for rollout (300s timeout), then shows status. For `monitoring` and `traefik` services, it uses Helm with values from `monitoring/values/`.
 
 ### Wiki Service (Pilot)
-- **Stack**: Custom PHP application with nginx + php-fpm sidecar + MariaDB 10.10
-- **Architecture**: Nginx and PHP-FPM run as sidecar containers in the same pod
+- **Stack**: Custom PHP application (in `wwwroot/`) - NOT MediaWiki
+- **Architecture**: Nginx and PHP-FPM run as sidecar containers in the same pod (`wiki-web` deployment)
+- **Database**: MariaDB 10.10 (`wiki-mysql` deployment)
 - **Images**: `ghcr.io/cybaxx/web-services-k8s/wiki:latest-nginx` and `:latest-php`
+- **ConfigMaps**: nginx.conf, php.ini, php-fpm-pool.conf embedded in `k8s/01-configmap.yaml`
 - **Storage**: PVCs for wwwroot (2Gi) and uploads (5Gi)
 - **Access**: `http://wiki.wetfish.local` (requires /etc/hosts entry)
+
+### Monitoring Stack
+Deployed via Helm charts with custom values in `monitoring/values/`:
+- `prometheus-stack-values.yaml` - kube-prometheus-stack (Prometheus + Grafana + Alertmanager)
+- `loki-values.yaml` - Log aggregation
+- `tempo-values.yaml` - Distributed tracing
 
 ## Git Workflow
 
 ```
-feature/branch -> PR -> dev-init-1 -> main
+feature/branch -> PR -> main
 ```
 
-CI/CD via GitHub Actions builds container images to GHCR with branch-based + SHA tags.
+CI/CD via GitHub Actions (`.github/workflows/build-wiki-{nginx,php}.yml`) builds container images to GHCR on push to main. Workflows trigger on changes to `services/wiki/**`.
 
 ## Documentation
 
 Detailed docs live in `docs/`:
-- `architecture-design.md` - System design, network architecture, data flow
+- `architecture-design.md` - System design, network architecture, sidecar pattern details
 - `k3s-setup-guide.md` - Cluster prerequisites and setup
 - `migration-strategy.md` - Four-phase migration plan with rollback procedures
 - `monitoring-stack.md` - FishVision observability model configuration
 - `troubleshooting.md` - Emergency commands and common issue resolution
+
+## Important Conventions
+- All scripts auto-detect PROJECT_DIR from their location (no hardcoded paths)
+- K8s manifests are numbered for ordered application (01-, 02-, etc.)
+- The old `services/wiki/kubernetes/` directory was removed; use `services/wiki/k8s/` only
+- Wiki service `.github/workflows/` in the service dir are the originals; the active copies are at repo root `.github/workflows/`

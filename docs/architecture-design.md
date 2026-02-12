@@ -299,7 +299,7 @@ Production Planning:
 
 ## 📁 Service Architecture Details
 
-### **Wiki Service (MediaWiki)**
+### **Wiki Service**
 ```yaml
 Architecture:
   Frontend: Nginx (Alpine)
@@ -309,7 +309,7 @@ Architecture:
   Storage: 10GB PersistentVolume
 
 Configuration:
-  ConfigMap: MediaWiki settings
+  ConfigMap: Wiki settings
   Secret: Database credentials
   PVC: File storage
   Service: Internal HTTP
