@@ -10,7 +10,7 @@
 ```
 Docker Host
 ├── Traefik (reverse proxy)
-├── Wiki (MediaWiki + MariaDB)
+├── Wiki (Custom PHP + MariaDB)
 ├── Forum (Node.js + PostgreSQL)
 ├── Home (static site)
 ├── Danger (JavaScript sandbox)
@@ -147,15 +147,15 @@ Docker Compose:
 ```yaml
 Kubernetes:
   - Namespace: wetfish-dev
-  - Deployment: wiki-app (MediaWiki + PHP-FPM)
-  - Service: wiki-service (ClusterIP)
+  - Deployment: wiki-web (nginx + PHP-FPM sidecar)
+  - Service: wiki-web (ClusterIP)
   - Ingress: wiki-ingress (Traefik)
-  - ConfigMap: wiki-config
-  - Secret: wiki-secrets
-  - PVC: wiki-storage (5GB)
-  - Deployment: wiki-db (MariaDB)
-  - Service: wiki-db-service
-  - PVC: wiki-db-storage (10GB)
+  - ConfigMap: wiki-nginx-config, wiki-php-config
+  - Secret: wiki-mysql-secret
+  - PVC: wiki-wwwroot (2Gi), wiki-uploads (5Gi)
+  - Deployment: wiki-mysql (MariaDB 10.10)
+  - Service: wiki-mysql
+  - PVC: wiki-mysql-data (2Gi)
 ```
 
 #### **Migration Steps**
@@ -292,7 +292,7 @@ echo "Wiki database migration completed!"
 
 ### **File Storage Migration**
 
-#### **MediaWiki File Migration**
+#### **Wiki File Migration**
 ```bash
 #!/bin/bash
 # migrate-wiki-files.sh

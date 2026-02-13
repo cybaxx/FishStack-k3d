@@ -59,8 +59,11 @@ Docker Compose → Kubernetes → Production K8s
 Internet → Cloudflare → k3d LoadBalancer → Traefik → Services
 
 Internal Routes:
-- wiki.wetfish.local → wetfish-dev/wiki-service
-- forum.wetfish.local → wetfish-dev/forum-service
+- wiki.wetfish.local → wetfish-dev/wiki-web
+- home.wetfish.local → wetfish-dev/home-web
+- glitch.wetfish.local → wetfish-dev/glitch-web
+- click.wetfish.local → wetfish-dev/click-web
+- danger.wetfish.local → wetfish-dev/danger-web
 - grafana.wetfish.local → wetfish-monitoring/grafana
 - prometheus.wetfish.local → wetfish-monitoring/prometheus
 ```
@@ -104,14 +107,15 @@ Resources:
 ```yaml
 Purpose: Development applications
 Components:
-  - Wiki (Custom PHP app with nginx + php-fpm sidecar + MariaDB)
-  - Forum (Node.js + PostgreSQL) - Future
-  - Home (Static site) - Future
-  - Danger (JavaScript sandbox) - Future
-  - Click (Click tracking) - Future
+  - Wiki (Custom PHP 8.2 app with nginx + php-fpm sidecar + MariaDB)
+  - Home (Static SvelteKit site served by nginx)
+  - Glitch (PHP 5.6 + nginx sidecar, no database)
+  - Click (PHP 5.6 + nginx sidecar + MariaDB)
+  - Danger (PHP 5.6 + nginx sidecar + MariaDB)
+  - Forum (SMF 2.1.6 + PHP 8.4 + MariaDB) - Deferred
 
 Resources:
-  - Deployments: Application containers (sidecar pattern)
+  - Deployments: Application containers (sidecar pattern for PHP services)
   - Services: Internal communication
   - PersistentVolumes: Database storage, uploads, wwwroot
   - ConfigMaps: nginx.conf, php.ini, php-fpm pool config
@@ -179,14 +183,19 @@ Features:
 ```yaml
 Services:
   Wiki:
-    - MariaDB 10.10
-    - PersistentVolume: 10GB
-    - Backup: Daily snapshots
-  
-  Forum:
-    - PostgreSQL 15
-    - PersistentVolume: 5GB
-    - Backup: Daily snapshots
+    - MariaDB 10.10 (utf8, wiki-mysql deployment)
+    - PersistentVolume: 2GB (dev)
+    - Strategy: Recreate (RWO PVC)
+
+  Click:
+    - MariaDB 10.10 (latin1/MyISAM, click-mysql deployment)
+    - PersistentVolume: 2GB (dev)
+    - Strategy: Recreate (RWO PVC)
+
+  Danger:
+    - MariaDB 10.10 (utf8/MyISAM, danger-mysql deployment)
+    - PersistentVolume: 2GB (dev)
+    - Strategy: Recreate (RWO PVC)
 
 Storage Strategy:
   - LocalPath provisioner (development)
@@ -196,16 +205,20 @@ Storage Strategy:
 
 ### **Application Containers**
 ```yaml
-Wiki Service:
-  - MediaWiki: latest stable
-  - PHP: 8.1-FPM
-  - Nginx: Alpine
-  - Extensions: Semantic MediaWiki, etc.
-  
-Forum Service:
-  - Node.js: 18 LTS
-  - Express.js framework
-  - Redis for caching
+Wiki Service (PHP 8.2):
+  - Custom PHP application (NOT MediaWiki)
+  - PHP-FPM 8.2 (Debian bookworm)
+  - Nginx: Alpine (sidecar)
+  - PVCs: wwwroot (2Gi), uploads (5Gi)
+
+PHP 5.6 Services (click, danger, glitch):
+  - php:5.6-fpm-alpine base image
+  - Nginx: 1.25-alpine (sidecar)
+  - Extensions: mysqli, mysql
+
+Home Service:
+  - SvelteKit (Node 20 build) → static nginx:1.25-alpine
+  - No sidecar, single container
 ```
 
 ---
@@ -302,22 +315,17 @@ Production Planning:
 ### **Wiki Service**
 ```yaml
 Architecture:
-  Frontend: Nginx (Alpine)
-  Backend: PHP-FPM 8.1
+  Frontend: Nginx (Alpine) - sidecar container
+  Backend: PHP-FPM 8.2 (Debian bookworm)
   Database: MariaDB 10.10
-  Cache: Redis (optional)
-  Storage: 10GB PersistentVolume
+  Deployment: wiki-web (sidecar), wiki-mysql
+  Storage: wwwroot PVC (2Gi), uploads PVC (5Gi), mysql PVC (2Gi)
 
 Configuration:
-  ConfigMap: Wiki settings
+  ConfigMap: nginx.conf, php.ini, php-fpm-pool.conf
   Secret: Database credentials
-  PVC: File storage
-  Service: Internal HTTP
-
-Dependencies:
-  - Database connection
-  - File storage access
-  - External API access (for extensions)
+  Service: wiki-web (ClusterIP), wiki-mysql (ClusterIP)
+  Ingress: wiki.wetfish.local
 ```
 
 ### **Traefik Ingress**

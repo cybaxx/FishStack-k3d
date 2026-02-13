@@ -18,7 +18,7 @@ k3d cluster restart wetfish-dev
 kubectl get pods --all-namespaces | grep -v Running
 
 # Access emergency shell
-kubectl exec -it deployment/wiki -n wetfish-dev -- bash
+kubectl exec -it deployment/wiki-web -n wetfish-dev -c php-fpm -- bash
 ```
 
 ---
@@ -111,7 +111,7 @@ kubectl get pvc -n wetfish-dev
 kubectl get storageclass
 
 # Solution: Delete and recreate PVC
-kubectl delete pvc wiki-storage -n wetfish-dev
+kubectl delete pvc wiki-wwwroot -n wetfish-dev
 # Kubernetes will recreate based on PVC template
 ```
 
@@ -142,13 +142,13 @@ docker push localhost:5000/wiki:latest
 **1. Check Service Configuration**
 ```bash
 # Get service details
-kubectl get svc wiki-service -n wetfish-dev -o wide
+kubectl get svc wiki-web -n wetfish-dev -o wide
 
 # Check endpoints
-kubectl get endpoints wiki-service -n wetfish-dev
+kubectl get endpoints wiki-web -n wetfish-dev
 
 # Describe service
-kubectl describe svc wiki-service -n wetfish-dev
+kubectl describe svc wiki-web -n wetfish-dev
 ```
 
 **2. Verify Pod Labels**
@@ -157,7 +157,7 @@ kubectl describe svc wiki-service -n wetfish-dev
 kubectl get pods -n wetfish-dev --show-labels
 
 # Check service selector
-kubectl get svc wiki-service -n wetfish-dev -o yaml | grep selector
+kubectl get svc wiki-web -n wetfish-dev -o yaml | grep selector
 
 # Ensure labels match selector
 ```
@@ -165,10 +165,10 @@ kubectl get svc wiki-service -n wetfish-dev -o yaml | grep selector
 **3. Test Pod Connectivity**
 ```bash
 # Test from within cluster
-kubectl run test-pod --image=busybox --rm -it --restart=Never -- nslookup wiki-service.wetfish-dev.svc.cluster.local
+kubectl run test-pod --image=busybox --rm -it --restart=Never -- nslookup wiki-web.wetfish-dev.svc.cluster.local
 
 # Test port accessibility
-kubectl run test-pod --image=busybox --rm -it --restart=Never -- wget -qO- http://wiki-service.wetfish-dev.svc.cluster.local:80
+kubectl run test-pod --image=busybox --rm -it --restart=Never -- wget -qO- http://wiki-web.wetfish-dev.svc.cluster.local:80
 ```
 
 ---
@@ -211,13 +211,13 @@ curl -v http://wiki.wetfish.local
 **3. Check Service Health**
 ```bash
 # Verify service is running
-kubectl get endpoints wiki-service -n wetfish-dev
+kubectl get endpoints wiki-web -n wetfish-dev
 
 # Check health endpoints
-kubectl exec deployment/wiki -n wetfish-dev -- curl localhost:80/health
+kubectl exec deployment/wiki-web -n wetfish-dev -- curl localhost:80/health
 
 # Verify Traefik can reach service
-kubectl exec deployment/traefik -n wetfish-system -- wget -qO- http://wiki-service.wetfish-dev.svc.cluster.local:80
+kubectl exec deployment/traefik -n wetfish-system -- wget -qO- http://wiki-web.wetfish-dev.svc.cluster.local:80
 ```
 
 ---
@@ -242,7 +242,7 @@ kubectl get servicemonitors -A
 kubectl describe servicemonitor wiki-metrics -n wetfish-dev
 
 # Verify service has metrics port
-kubectl get svc wiki-service -n wetfish-dev -o yaml
+kubectl get svc wiki-web -n wetfish-dev -o yaml
 ```
 
 **2. Check Prometheus Configuration**
@@ -260,10 +260,10 @@ curl http://localhost:9090/api/v1/targets
 **3. Verify Metrics Endpoint**
 ```bash
 # Test metrics endpoint from cluster
-kubectl run test-metrics --image=curlimages/curl --rm -it --restart=Never -- curl http://wiki-service.wetfish-dev.svc.cluster.local:80/metrics
+kubectl run test-metrics --image=curlimages/curl --rm -it --restart=Never -- curl http://wiki-web.wetfish-dev.svc.cluster.local:80/metrics
 
 # Check if metrics are exposed
-kubectl exec deployment/wiki -n wetfish-dev -- curl localhost:80/metrics
+kubectl exec deployment/wiki-web -n wetfish-dev -- curl localhost:80/metrics
 ```
 
 ### **Grafana Dashboard Issues**
@@ -315,37 +315,37 @@ kubectl rollout restart deployment/grafana -n wetfish-monitoring
 **1. Check Database Pod**
 ```bash
 # Check pod status
-kubectl get pods -l app=wiki-db -n wetfish-dev
+kubectl get pods -l app=wiki-mysql -n wetfish-dev
 
 # Check database logs
-kubectl logs deployment/wiki-db -n wetfish-dev
+kubectl logs deployment/wiki-mysql -n wetfish-dev
 
 # Test database connection
-kubectl exec deployment/wiki-db -n wetfish-dev -- mysql -u root -p$MYSQL_ROOT_PASSWORD -e "SHOW DATABASES;"
+kubectl exec deployment/wiki-mysql -n wetfish-dev -- mysql -u root -p$MYSQL_ROOT_PASSWORD -e "SHOW DATABASES;"
 ```
 
 **2. Verify Network Connectivity**
 ```bash
 # Test from application pod
-kubectl exec deployment/wiki -n wetfish-dev -- telnet wiki-db-service.wetfish-dev.svc.cluster.local 3306
+kubectl exec deployment/wiki-web -n wetfish-dev -- telnet wiki-mysql-service.wetfish-dev.svc.cluster.local 3306
 
 # Check service endpoints
-kubectl get endpoints wiki-db-service -n wetfish-dev
+kubectl get endpoints wiki-mysql-service -n wetfish-dev
 
 # Test DNS resolution
-kubectl run test-dns --image=busybox --rm -it --restart=Never -- nslookup wiki-db-service.wetfish-dev.svc.cluster.local
+kubectl run test-dns --image=busybox --rm -it --restart=Never -- nslookup wiki-mysql-service.wetfish-dev.svc.cluster.local
 ```
 
 **3. Check Configuration**
 ```bash
 # Review database secrets
-kubectl get secret wiki-secrets -n wetfish-dev -o yaml
+kubectl get secret wiki-mysql-secret -n wetfish-dev -o yaml
 
 # Check environment variables
-kubectl exec deployment/wiki -n wetfish-dev -- env | grep MYSQL
+kubectl exec deployment/wiki-web -n wetfish-dev -- env | grep MYSQL
 
 # Verify configuration files
-kubectl exec deployment/wiki-db -n wetfish-dev -- cat /etc/mysql/my.cnf
+kubectl exec deployment/wiki-mysql -n wetfish-dev -- cat /etc/mysql/my.cnf
 ```
 
 ### **Data Migration Issues**
@@ -372,13 +372,13 @@ file -bi wiki-backup.sql
 **2. Test Import Process**
 ```bash
 # Test with small sample
-head -100 wiki-backup.sql | kubectl exec wiki-db-pod -i -- mysql -u root -p database_name
+head -100 wiki-backup.sql | kubectl exec wiki-mysql-pod -i -- mysql -u root -p database_name
 
 # Check for errors
-kubectl logs wiki-db-pod | grep ERROR
+kubectl logs wiki-mysql-pod | grep ERROR
 
 # Verify import
-kubectl exec wiki-db-pod -- mysql -u root -p database_name -e "SELECT COUNT(*) FROM page;"
+kubectl exec wiki-mysql-pod -- mysql -u root -p database_name -e "SELECT COUNT(*) FROM page;"
 ```
 
 ---
@@ -397,13 +397,13 @@ kubectl exec wiki-db-pod -- mysql -u root -p database_name -e "SELECT COUNT(*) F
 **1. Check Deployment Status**
 ```bash
 # Get deployment status
-kubectl rollout status deployment/wiki -n wetfish-dev
+kubectl rollout status deployment/wiki-web -n wetfish-dev
 
 # Check rollout history
-kubectl rollout history deployment/wiki -n wetfish-dev
+kubectl rollout history deployment/wiki-web -n wetfish-dev
 
 # Describe deployment
-kubectl describe deployment/wiki -n wetfish-dev
+kubectl describe deployment/wiki-web -n wetfish-dev
 ```
 
 **2. Investigate Pod Issues**
@@ -412,7 +412,7 @@ kubectl describe deployment/wiki -n wetfish-dev
 kubectl get events -n wetfish-dev --sort-by=.metadata.creationTimestamp
 
 # Check pod logs
-kubectl logs deployment/wiki -n wetfish-dev --previous
+kubectl logs deployment/wiki-web -n wetfish-dev --previous
 
 # Check resource usage
 kubectl top pods -n wetfish-dev
@@ -421,13 +421,13 @@ kubectl top pods -n wetfish-dev
 **3. Manual Rollback**
 ```bash
 # Rollback to previous revision
-kubectl rollout undo deployment/wiki -n wetfish-dev
+kubectl rollout undo deployment/wiki-web -n wetfish-dev
 
 # Rollback to specific revision
-kubectl rollout undo deployment/wiki -n wetfish-dev --to-revision=2
+kubectl rollout undo deployment/wiki-web -n wetfish-dev --to-revision=2
 
 # Restart deployment
-kubectl rollout restart deployment/wiki -n wetfish-dev
+kubectl rollout restart deployment/wiki-web -n wetfish-dev
 ```
 
 ---
@@ -475,15 +475,15 @@ sed -i 's/:8080/:8081/g' docs/*.md
 **Container Debugging**
 ```bash
 # Access container shell
-kubectl exec -it deployment/wiki -n wetfish-dev -- bash
+kubectl exec -it deployment/wiki-web -n wetfish-dev -c php-fpm -- bash
 
 # Run commands in container
-kubectl exec deployment/wiki -n wetfish-dev -- ps aux
-kubectl exec deployment/wiki -n wetfish-dev -- netstat -tulpn
+kubectl exec deployment/wiki-web -n wetfish-dev -- ps aux
+kubectl exec deployment/wiki-web -n wetfish-dev -- netstat -tulpn
 
 # Copy files to/from container
-kubectl cp local-file wiki-pod:/remote-path/
-kubectl cp wiki-pod:/remote-path/ remote-file
+kubectl cp local-file wiki-web-pod:/remote-path/
+kubectl cp wiki-web-pod:/remote-path/ remote-file
 ```
 
 **Network Debugging**
@@ -495,7 +495,7 @@ kubectl run dns-test --image=busybox --rm -it --restart=Never -- nslookup google
 kubectl run net-test --image=nicolaka/netshoot --rm -it --restart=Never -- bash
 
 # Port forwarding
-kubectl port-forward svc/wiki-service 8080:80 -n wetfish-dev
+kubectl port-forward svc/wiki-web 8080:80 -n wetfish-dev
 ```
 
 **Resource Debugging**
@@ -538,10 +538,10 @@ k3d cluster delete <unused-cluster>
 kubectl get all -n wetfish-dev -o yaml > backup-wetfish-dev.yaml
 
 # Backup database
-kubectl exec deployment/wiki-db -n wetfish-dev -- mysqldump -u root -p$MYSQL_ROOT_PASSWORD --all-databases > wiki-db-backup.sql
+kubectl exec deployment/wiki-mysql -n wetfish-dev -- mysqldump -u root -p$MYSQL_ROOT_PASSWORD --all-databases > wiki-mysql-backup.sql
 
 # Backup persistent data
-kubectl cp wiki-db-pod:/var/lib/mysql wiki-db-data/
+kubectl cp wiki-mysql-pod:/var/lib/mysql wiki-mysql-data/
 ```
 
 ### **Performance Monitoring**
@@ -556,7 +556,7 @@ kubectl top pods -A
 kubectl describe nodes | grep -A 5 "Allocated resources"
 
 # Monitor specific pod
-kubectl exec deployment/wiki -n wetfish-dev -- top
+kubectl exec deployment/wiki-web -n wetfish-dev -- top
 ```
 
 ---
@@ -568,16 +568,16 @@ kubectl exec deployment/wiki -n wetfish-dev -- top
 **Application Logs**
 ```bash
 # Get recent logs
-kubectl logs deployment/wiki -n wetfish-dev --tail=100
+kubectl logs deployment/wiki-web -n wetfish-dev --tail=100
 
 # Follow logs in real-time
-kubectl logs deployment/wiki -n wetfish-dev -f
+kubectl logs deployment/wiki-web -n wetfish-dev -f
 
 # Get logs from specific time
-kubectl logs deployment/wiki -n wetfish-dev --since=1h
+kubectl logs deployment/wiki-web -n wetfish-dev --since=1h
 
 # Get previous container logs
-kubectl logs deployment/wiki -n wetfish-dev --previous
+kubectl logs deployment/wiki-web -n wetfish-dev --previous
 ```
 
 **System Logs**

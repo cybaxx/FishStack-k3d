@@ -74,7 +74,7 @@ kubectl port-forward svc/grafana 3000:3000 -n wetfish-monitoring
 
 ### Namespaces
 - **wetfish-system** - Infrastructure (Traefik ingress controller)
-- **wetfish-dev** - Application services (wiki, future: forum, home, danger, click)
+- **wetfish-dev** - Application services (wiki, home, glitch, click, danger; future: forum)
 - **wetfish-monitoring** - Observability stack (Prometheus, Grafana, Loki, Tempo)
 
 ### Service Layout

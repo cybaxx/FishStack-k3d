@@ -1,322 +1,196 @@
-# 🌊 Wetfish Web-Services K8s
+# Wetfish Web-Services K8s
 
-> Kubernetes migration of wetfish web-services with complete observability stack based on FishVision monitoring model.
-
----
-
-## 🎯 Project Overview
-
-This project migrates the wetfish web-services from Docker Compose to Kubernetes with:
-- **Infrastructure**: On-prem k3d cluster for development
-- **Ingress**: Traefik v2 with Cloudflare integration
-- **Pilot Service**: Wiki (custom PHP application with nginx + php-fpm + MariaDB)
-- **Monitoring**: Full observability stack (Prometheus, Grafana, Loki, Tempo)
-- **CI/CD**: GitHub Actions with GHCR container registry
+Kubernetes migration of wetfish web-services with observability stack (Prometheus, Grafana, Loki, Tempo).
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
-### **Current Development Stack**
 ```
-┌─────────────────────────────────────────────────────────┐
-│                   k3d Cluster                      │
-├─────────────────────────────────────────────────────────┤
-│  wetfish-system    │  wetfish-dev  │ wetfish-monitoring │
-│  (Traefik)        │  (Wiki App)   │  (Observability)   │
-└─────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                      k3d Cluster                            │
+├─────────────────────────────────────────────────────────────┤
+│  wetfish-system    │  wetfish-dev      │ wetfish-monitoring  │
+│  (Traefik)         │  (Services)       │  (Observability)    │
+│                    │  ├─ Wiki          │  ├─ Prometheus       │
+│                    │  ├─ Home          │  ├─ Grafana          │
+│                    │  ├─ Glitch        │  ├─ Loki             │
+│                    │  ├─ Click         │  ├─ Tempo            │
+│                    │  └─ Danger        │  └─ AlertManager     │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-### **Monitoring Stack (FishVision Model)**
-```
-Applications → Metrics → Prometheus → Alertmanager → IRC/Webhook
-                ↓           ↓           ↓
-              Logs → Loki → Grafana ←───────┘
-                ↓           ↓
-             Traces → Tempo → Distributed Tracing
-```
+### Services
+
+| Service | Stack | Database | Status |
+|---------|-------|----------|--------|
+| **wiki** | PHP 8.2 + nginx (sidecar) | MariaDB 10.10 | Running |
+| **home** | SvelteKit (static nginx) | None | Running |
+| **glitch** | PHP 5.6 + nginx (sidecar) | None | Running |
+| **click** | PHP 5.6 + nginx (sidecar) | MariaDB 10.10 | Running |
+| **danger** | PHP 5.6 + nginx (sidecar) | MariaDB 10.10 | Running |
+| **forum** | SMF 2.1.6 + PHP 8.4 | MariaDB | Deferred |
 
 ---
 
-## 🚀 Quick Start (Development)
+## Quick Start
 
-### **Prerequisites**
+### Prerequisites
 - Docker Desktop or Docker Engine
-- k3d (Kubernetes)
+- k3d
 - kubectl
-- helm (Kubernetes package manager)
-- GitHub CLI (for authentication)
+- helm
 
-### **1. Setup Development Environment**
+### 1. Setup Development Environment
 ```bash
-# Clone repository
 git clone git@github.com:cybaxx/web-services-k8s.git
 cd web-services-k8s
-git checkout dev-init-1
 
-# Setup k3d cluster and dependencies
+# Create k3d cluster with local registry
 ./scripts/setup-dev.sh
 
-# Setup DNS entries for local access
+# Add DNS entries to /etc/hosts
 sudo ./scripts/setup-hosts.sh
 ```
 
-### **2. Deploy Wiki Service**
+### 2. Build and Push Images
 ```bash
-# Deploy wiki application
+# Wiki (PHP 8.2)
+docker build -t localhost:5000/wiki:nginx -f services/wiki/Dockerfile.nginx services/wiki/
+docker build -t localhost:5000/wiki:php -f services/wiki/Dockerfile.php services/wiki/
+docker push localhost:5000/wiki:nginx && docker push localhost:5000/wiki:php
+
+# Home (static SvelteKit)
+docker build -t localhost:5000/home:latest services/home/
+docker push localhost:5000/home:latest
+
+# Glitch (PHP 5.6)
+docker build -f services/glitch/Dockerfile.nginx -t localhost:5000/glitch:nginx services/glitch/
+docker build -f services/glitch/Dockerfile.php -t localhost:5000/glitch:php services/glitch/
+docker push localhost:5000/glitch:nginx && docker push localhost:5000/glitch:php
+
+# Click (PHP 5.6)
+docker build -f services/click/Dockerfile.nginx -t localhost:5000/click:nginx services/click/
+docker build -f services/click/Dockerfile.php -t localhost:5000/click:php services/click/
+docker push localhost:5000/click:nginx && docker push localhost:5000/click:php
+
+# Danger (PHP 5.6)
+docker build -f services/danger/Dockerfile.nginx -t localhost:5000/danger:nginx services/danger/
+docker build -f services/danger/Dockerfile.php -t localhost:5000/danger:php services/danger/
+docker push localhost:5000/danger:nginx && docker push localhost:5000/danger:php
+```
+
+### 3. Deploy Services
+```bash
+# Deploy all services
 ./scripts/deploy.sh wetfish-dev wiki
+./scripts/deploy.sh wetfish-dev home
+./scripts/deploy.sh wetfish-dev glitch
+./scripts/deploy.sh wetfish-dev click
+./scripts/deploy.sh wetfish-dev danger
 
-# Wait for rollout
-kubectl rollout status deployment/wiki-web -n wetfish-dev
-
-# Run health checks
-./scripts/test-deployment.sh wetfish-dev wiki
+# Load database schemas (first deploy only)
+kubectl exec -i deployment/wiki-mysql -n wetfish-dev -- mysql -uroot -pwikipass wikidb < services/wiki/config/schema.sql
+kubectl exec -i deployment/click-mysql -n wetfish-dev -- mysql -uroot -pclickpass clickdb < services/click/schema.sql
+kubectl exec -i deployment/danger-mysql -n wetfish-dev -- mysql -uroot -pdangerpass dangerdb < services/danger/schema.sql
 ```
 
-### **3. Access Services**
+### 4. Access Services
+```
+http://wiki.wetfish.local:8080
+http://home.wetfish.local:8080
+http://glitch.wetfish.local:8080
+http://click.wetfish.local:8080
+http://danger.wetfish.local:8080
+```
+
+---
+
+## Development Commands
+
+### Cluster Lifecycle
 ```bash
-# Wiki Application
-open http://wiki.wetfish.local
-
-# Monitoring Stack
-open http://grafana.wetfish.local  # admin/admin
-open http://prometheus.wetfish.local
-open http://loki.wetfish.local
-open http://tempo.wetfish.local
+./scripts/setup-dev.sh          # Create k3d cluster
+./scripts/cleanup.sh            # Tear down cluster
+sudo ./scripts/setup-hosts.sh   # Manage /etc/hosts entries
+k3d cluster start wetfish-dev   # Start existing cluster
+k3d cluster stop wetfish-dev    # Stop cluster
 ```
 
----
-
-## 📊 Monitoring & Observability
-
-Based on the proven FishVision monitoring stack:
-
-### **Metrics Collection**
-- **Prometheus**: Scrapes application and cluster metrics
-- **Node Exporter**: Host-level metrics
-- **Service Monitors**: Kubernetes service discovery
-
-### **Alerting**
-- **Alertmanager**: Routes and manages alerts
-- **IRC Relay**: Real-time notifications via webhook
-- **Alert Rules**: CPU, memory, disk, application health
-
-### **Visualization**
-- **Grafana**: Dashboards for metrics, logs, and traces
-- **Loki**: Log aggregation and querying
-- **Tempo**: Distributed tracing
-
-### **Key Dashboards**
-- Kubernetes cluster overview
-- Wiki application metrics
-- Infrastructure health
-- Custom alert status
-
----
-
-## 🛠️ Development Workflow
-
-### **Git Workflow**
-```
-feature/branch → PR → dev-init-1 → (testing) → main → staging → production
-```
-
-### **CI/CD Pipeline**
-1. **Push to dev-init-1** → GitHub Actions CI
-2. **Build & Test** → Container images to GHCR
-3. **Deploy to Dev** → Automatic k3d deployment
-4. **Health Checks** → Monitoring verification
-
-### **Container Registry**
-- **Registry**: GitHub Container Registry (GHCR)
-- **Naming**: `ghcr.io/cybaxx/web-services-k8s/wiki:dev-init-1`
-- **Tags**: Branch-based + SHA for reproducibility
-
----
-
-## 📁 Project Structure
-
-```
-web-services-k8s/
-├── .github/workflows/     # CI/CD pipelines
-├── services/            # Application containers
-│   └── wiki/           # Wiki service (pilot)
-├── monitoring/          # Observability stack
-│   ├── manifests/       # K8s deployments
-│   ├── configs/         # Prometheus, Grafana, etc.
-│   └── grafana/        # Dashboard definitions
-├── infrastructure/      # Core infrastructure
-│   └── traefik/       # Ingress controller
-├── scripts/            # Automation scripts
-└── docs/              # Documentation
-```
-
----
-
-## 🔧 Local Development Commands
-
-### **Cluster Management**
+### Deploying
 ```bash
-# Start/stop k3d cluster
-k3d cluster start wetfish-dev
-k3d cluster stop wetfish-dev
-
-# Access cluster info
-kubectl cluster-info
-kubectl get nodes
-kubectl get namespaces
+./scripts/deploy.sh <namespace> <service> [action]
+./scripts/deploy.sh wetfish-dev wiki              # Deploy wiki
+./scripts/deploy.sh wetfish-dev wiki delete        # Remove wiki
+./scripts/deploy.sh wetfish-monitoring monitoring  # Deploy monitoring (Helm)
+./scripts/deploy.sh wetfish-system traefik         # Deploy Traefik
 ```
 
-### **Application Management**
+### Debugging
 ```bash
-# Deploy services
-./scripts/deploy.sh wetfish-dev wiki
-
-# Run health checks
+# Health checks
 ./scripts/test-deployment.sh wetfish-dev wiki
 
-# Check deployment status
+# Pods and logs (sidecar containers: nginx + php-fpm)
 kubectl get pods -n wetfish-dev
-kubectl get services -n wetfish-dev
-kubectl get ingress -n wetfish-dev
-
-# View logs (nginx container)
 kubectl logs deployment/wiki-web -n wetfish-dev -c nginx -f
-
-# View logs (php-fpm container)
 kubectl logs deployment/wiki-web -n wetfish-dev -c php-fpm -f
 
-# Access container shell (nginx)
-kubectl exec -it deployment/wiki-web -n wetfish-dev -c nginx -- sh
-
-# Access container shell (php-fpm)
+# Shell access
 kubectl exec -it deployment/wiki-web -n wetfish-dev -c php-fpm -- bash
 ```
 
-### **Monitoring Access**
-```bash
-# Port forwarding for local access
-kubectl port-forward svc/grafana 3000:3000 -n wetfish-monitoring
-kubectl port-forward svc/prometheus 9090:9090 -n wetfish-monitoring
+---
 
-# View monitoring targets
-kubectl get servicemonitors -n wetfish-monitoring
+## Project Structure
+
+```
+web-services-k8s/
+├── .github/workflows/      # CI/CD pipelines (GitHub Actions)
+├── services/               # Application services
+│   ├── wiki/               # Wiki (PHP 8.2 custom app + MariaDB)
+│   ├── home/               # Home (SvelteKit static site)
+│   ├── glitch/             # Glitch (PHP 5.6 + Node 14)
+│   ├── click/              # Click (PHP 5.6 + MariaDB)
+│   └── danger/             # Danger (PHP 5.6 + MariaDB)
+├── infrastructure/         # Core infrastructure
+│   └── traefik/            # Traefik v2.11 ingress controller
+├── monitoring/             # Observability stack
+│   └── values/             # Helm values (Prometheus, Loki, Tempo)
+├── scripts/                # Automation scripts
+└── docs/                   # Documentation
+```
+
+Each service has `k8s/` manifests (applied in numbered order), `Dockerfile.*` container definitions, and `config/` application configs.
+
+---
+
+## CI/CD
+
+GitHub Actions workflows in `.github/workflows/` build container images to GHCR on push to main. Workflows trigger on changes to their respective `services/<name>/**` paths.
+
+```
+feature/branch -> PR -> main
 ```
 
 ---
 
-## 📋 Current Status (dev-init-1)
+## Roadmap
 
-### **✅ Completed**
-- [x] Repository structure
-- [x] Git workflow (feature branch approach)
-- [x] Monitoring stack design (FishVision-based)
-- [x] CI/CD pipeline plan
+### Phase 1: Foundation (complete)
+- [x] k3d cluster with Traefik ingress
+- [x] Wiki service (pilot migration)
+- [x] Home, glitch, click, danger services
+- [x] CI/CD workflows
+- [x] Monitoring Helm values
 
-### **🚧 In Progress**
-- [ ] Wiki service containerization
-- [ ] K3s cluster setup scripts
-- [ ] Traefik ingress configuration
-- [ ] GitHub Actions workflows
-
-### **📋 Next Steps**
-1. Containerize wiki service with Docker
-2. Create Kubernetes manifests for wiki deployment
-3. Deploy monitoring stack (Prometheus, Grafana, Loki, Tempo)
-4. Set up GitHub Actions CI/CD pipeline
-5. Test end-to-end deployment
-
----
-
-## 🔐 Security Configuration
-
-### **Development Environment**
-- **Cluster**: Single-user k3d setup
-- **Access**: kubectl with local kubeconfig
-- **Registry**: GitHub Container Registry (personal)
-- **Secrets**: Local development only
-
-### **Security Best Practices**
-- Non-root containers
-- Resource limits and requests
-- Network policies (when ready)
-- RBAC configuration
-- Secret management
-
----
-
-## 🐛 Troubleshooting
-
-### **Common Issues**
-
-#### **Cluster Access**
-```bash
-# Reset kubectl context
-kubectl config use-context k3d-wetfish-dev
-
-# Check cluster status
-k3d cluster list
-kubectl get nodes
-```
-
-#### **Service Access**
-```bash
-# Check DNS resolution
-nslookup wiki.wetfish.local
-
-# Verify ingress
-kubectl get ingress -n wetfish-dev
-kubectl describe ingress wiki-ingress -n wetfish-dev
-```
-
-#### **Monitoring**
-```bash
-# Check Prometheus targets
-curl http://localhost:9090/api/v1/targets
-
-# View Grafana data sources
-curl http://localhost:3000/api/datasources
-```
-
----
-
-## 🤝 Contributing
-
-1. **Feature branches**: Create from `dev-init-1`
-2. **Pull requests**: Target `dev-init-1` for initial development
-3. **Testing**: Verify deployment to k3d before PR
-4. **Documentation**: Update README and relevant docs
-
----
-
-## 📞 Support
-
-- **Repository**: https://github.com/cybaxx/web-services-k8s
-- **Issues**: Create GitHub issue for bugs/features
-- **Discussions**: Use GitHub Discussions for questions
-
----
-
-## 📍 Roadmap
-
-### **Phase 1: Foundation (Current)**
-- [x] Repository setup
-- [ ] Wiki service deployment
-- [ ] Monitoring stack
-- [ ] Basic CI/CD
-
-### **Phase 2: Production Ready**
+### Phase 2: Production Ready
 - [ ] Production cluster configuration
-- [ ] Advanced monitoring
-- [ ] Security hardening
+- [ ] Security hardening (see `docs/security-audit-action-items.md`)
 - [ ] Backup strategies
+- [ ] TLS/HTTPS enforcement
 
-### **Phase 3: Scale Out**
-- [ ] Additional services (forum, home, danger, click)
+### Phase 3: Scale Out
+- [ ] Forum service (SMF 2.1.6)
 - [ ] Multi-environment support
-- [ ] Advanced CI/CD (helm charts)
-- [ ] Team collaboration features
-
----
-
-🚀 **Made with ❤️ for the wetfish community**
+- [ ] GitOps (ArgoCD)
