@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: glitch-web
+  namespace: wetfish-dev
+  labels:
+    app: glitch
+    component: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: glitch
+      component: web
+  template:
+    metadata:
+      labels:
+        app: glitch
+        component: web
+    spec:
+      containers:
+      # Nginx container
+      - name: nginx
+        image: wetfish-registry:5000/glitch:nginx
+        ports:
+        - containerPort: 80
+          name: http
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "25m"
+          limits:
+            memory: "64Mi"
+            cpu: "100m"
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: nginx.conf
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+      # PHP-FPM container (sidecar)
+      - name: php-fpm
+        image: wetfish-registry:5000/glitch:php
+        ports:
+        - containerPort: 9000
+          name: php-fpm
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        livenessProbe:
+          tcpSocket:
+            port: 9000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: 9000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: glitch-nginx-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: glitch-web
+  namespace: wetfish-dev
+  labels:
+    app: glitch
+    component: web
+spec:
+  selector:
+    app: glitch
+    component: web
+  ports:
+  - port: 80
+    targetPort: 80
+    name: http
+  type: ClusterIP

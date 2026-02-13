@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: home-web
+  namespace: wetfish-dev
+  labels:
+    app: home
+    component: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: home
+      component: web
+  template:
+    metadata:
+      labels:
+        app: home
+        component: web
+    spec:
+      containers:
+      - name: nginx
+        image: wetfish-registry:5000/home:latest
+        ports:
+        - containerPort: 80
+          name: http
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "25m"
+          limits:
+            memory: "64Mi"
+            cpu: "100m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: home-web
+  namespace: wetfish-dev
+  labels:
+    app: home
+    component: web
+spec:
+  selector:
+    app: home
+    component: web
+  ports:
+  - port: 80
+    targetPort: 80
+    name: http
+  type: ClusterIP

@@ -53,7 +53,7 @@ k3d Cluster
 
 #### **Tasks**
 - [ ] Analyze current Docker Compose wiki configuration
-- [ ] Containerize MediaWiki with custom extensions
+- [ ] Containerize Wiki with custom extensions
 - [ ] Create Kubernetes manifests for wiki deployment
 - [ ] Set up MariaDB with persistent storage
 - [ ] Configure monitoring and alerting
@@ -130,7 +130,7 @@ k3d Cluster
 ```yaml
 Docker Compose:
   wiki-web:
-    image: mediawiki:latest
+    image: wiki:latest
     ports: ["8080:80"]
     volumes: ["./data:/var/www/html"]
   

@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: home-ingress
+  namespace: wetfish-dev
+  labels:
+    app: home
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/router.priority: "100"
+spec:
+  rules:
+  - host: home.wetfish.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: home-web
+            port:
+              number: 80

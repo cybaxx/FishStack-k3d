@@ -4,25 +4,31 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Kubernetes migration of wetfish web-services from Docker Compose to a k3d cluster with full observability (Prometheus, Grafana, Loki, Tempo). Currently in Phase 1 (Foundation) with the wiki service as the pilot migration.
+Kubernetes migration of wetfish web-services from Docker Compose to a k3d cluster with full observability (Prometheus, Grafana, Loki, Tempo).
 
 ### Migration Phases
-1. **Foundation (current)** - Wiki pilot, k3d cluster, CI/CD, monitoring stack
+1. **Foundation (current)** - Services migrated, k3d cluster, CI/CD, monitoring stack
 2. **Production Ready** - Production cluster, security hardening, backups
-3. **Scale Out** - Remaining services (forum, home, danger, click), multi-env, GitOps
+3. **Scale Out** - Forum service, multi-env, GitOps
 
 ### Current Status
-- Wiki service **running in k3d cluster** (verified: Traefik ingress routing works)
+- **5 services running in k3d cluster**: wiki, home, glitch, click, danger
+- Forum service deferred (complex SMF setup, needs separate planning)
 - GitHub Actions CI/CD workflows in place
 - Infrastructure deployed (Traefik, namespaces)
 - Monitoring Helm values created (not yet deployed to cluster)
 - Scripts complete (setup, deploy, cleanup, hosts, testing)
 
 ### Known Issues & Lessons Learned
-- Dockerfiles use Debian bookworm default packages (PHP 8.2, Node 18) - NodeSource/Sury repos removed (EOL/broken GPG keys)
+- Wiki Dockerfiles use Debian bookworm default packages (PHP 8.2, Node 18) - NodeSource/Sury repos removed (EOL/broken GPG keys)
+- Click, danger, glitch use `php:5.6-fpm-alpine` Docker image (Sury PHP 5.6 repos broken)
 - MySQL deployment uses `strategy: Recreate` (required for RWO PVCs)
 - MySQL `sql_mode = ""` needed for legacy PHP code that passes `'NULL'` strings for auto-increment
-- DB schema must be loaded manually on first deploy: `kubectl exec -i deployment/wiki-mysql -n wetfish-dev -- mysql -uroot -pwikipass wikidb < services/wiki/config/schema.sql`
+- MySQL `character-set-server` must have matching `collation-server` (MariaDB 10.10 defaults to utf8mb4 collation)
+- DB schemas must be loaded manually on first deploy:
+  - `kubectl exec -i deployment/wiki-mysql -n wetfish-dev -- mysql -uroot -pwikipass wikidb < services/wiki/config/schema.sql`
+  - `kubectl exec -i deployment/click-mysql -n wetfish-dev -- mysql -uroot -pclickpass clickdb < services/click/schema.sql`
+  - `kubectl exec -i deployment/danger-mysql -n wetfish-dev -- mysql -uroot -pdangerpass dangerdb < services/danger/schema.sql`
 - If k3d agent nodes show NotReady, restart them: `docker restart k3d-wetfish-dev-agent-0 k3d-wetfish-dev-agent-1`
 
 ## Key Commands

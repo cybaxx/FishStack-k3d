@@ -1,0 +1,125 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: click-web
+  namespace: wetfish-dev
+  labels:
+    app: click
+    component: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: click
+      component: web
+  template:
+    metadata:
+      labels:
+        app: click
+        component: web
+    spec:
+      containers:
+      # Nginx container
+      - name: nginx
+        image: wetfish-registry:5000/click:nginx
+        ports:
+        - containerPort: 80
+          name: http
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "25m"
+          limits:
+            memory: "64Mi"
+            cpu: "100m"
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: nginx.conf
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+      # PHP-FPM container (sidecar)
+      - name: php-fpm
+        image: wetfish-registry:5000/click:php
+        ports:
+        - containerPort: 9000
+          name: php-fpm
+        env:
+        - name: MYSQL_HOST
+          value: "click-mysql.wetfish-dev.svc.cluster.local"
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: click-mysql-secret
+              key: mysql-user
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: click-mysql-secret
+              key: mysql-password
+        - name: MYSQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: click-mysql-secret
+              key: mysql-database
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        volumeMounts:
+        - name: php-config
+          mountPath: /usr/local/etc/php/php.ini
+          subPath: php.ini
+        - name: php-config
+          mountPath: /usr/local/etc/php-fpm.d/www.conf
+          subPath: php-fpm-pool.conf
+        livenessProbe:
+          tcpSocket:
+            port: 9000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: 9000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: click-nginx-config
+      - name: php-config
+        configMap:
+          name: click-php-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: click-web
+  namespace: wetfish-dev
+  labels:
+    app: click
+    component: web
+spec:
+  selector:
+    app: click
+    component: web
+  ports:
+  - port: 80
+    targetPort: 80
+    name: http
+  type: ClusterIP
