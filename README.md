@@ -10,13 +10,13 @@ Kubernetes migration of wetfish web-services with observability stack (Prometheu
 ┌─────────────────────────────────────────────────────────────┐
 │                      k3d Cluster                            │
 ├─────────────────────────────────────────────────────────────┤
-│  wetfish-system    │  wetfish-dev      │ wetfish-monitoring  │
-│  (Traefik)         │  (Services)       │  (Observability)    │
-│                    │  ├─ Wiki          │  ├─ Prometheus       │
-│                    │  ├─ Home          │  ├─ Grafana          │
-│                    │  ├─ Glitch        │  ├─ Loki             │
-│                    │  ├─ Click         │  ├─ Tempo            │
-│                    │  └─ Danger        │  └─ AlertManager     │
+│  wetfish-system    │  wetfish-dev      │ wetfish-monitoring │
+│  (Traefik)         │  (Services)       │  (Observability)   │
+│                    │  ├─ Wiki          │  ├─ Prometheus     │
+│                    │  ├─ Home          │  ├─ Grafana        │
+│                    │  ├─ Glitch        │  ├─ Loki           │
+│                    │  ├─ Click         │  ├─ Tempo          │
+│                    │  └─ Danger        │  └─ AlertManager   │
 └─────────────────────────────────────────────────────────────┘
 ```
 
