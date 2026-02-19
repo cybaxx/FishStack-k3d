@@ -1,0 +1,146 @@
+# Default deny all ingress and egress in wetfish-dev namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: wetfish-dev
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+---
+# Allow all pods to reach kube-dns for DNS resolution
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns
+  namespace: wetfish-dev
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+---
+# Allow Traefik (wetfish-system) to reach web services on port 80
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-traefik-ingress
+  namespace: wetfish-dev
+spec:
+  podSelector:
+    matchLabels:
+      component: web
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: wetfish-system
+      podSelector:
+        matchLabels:
+          app: traefik
+    ports:
+    - protocol: TCP
+      port: 80
+---
+# Allow wiki-web to reach wiki-mysql on port 3306
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-wiki-web-to-mysql
+  namespace: wetfish-dev
+spec:
+  podSelector:
+    matchLabels:
+      app: wiki
+      component: mysql
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: wiki
+          component: web
+    ports:
+    - protocol: TCP
+      port: 3306
+---
+# Allow click-web to reach click-mysql on port 3306
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-click-web-to-mysql
+  namespace: wetfish-dev
+spec:
+  podSelector:
+    matchLabels:
+      app: click
+      component: mysql
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: click
+          component: web
+    ports:
+    - protocol: TCP
+      port: 3306
+---
+# Allow danger-web to reach danger-mysql on port 3306
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-danger-web-to-mysql
+  namespace: wetfish-dev
+spec:
+  podSelector:
+    matchLabels:
+      app: danger
+      component: mysql
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: danger
+          component: web
+    ports:
+    - protocol: TCP
+      port: 3306
+---
+# Allow web pods to reach their MySQL services (egress side)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-web-to-mysql-egress
+  namespace: wetfish-dev
+spec:
+  podSelector:
+    matchLabels:
+      component: web
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          component: mysql
+    ports:
+    - protocol: TCP
+      port: 3306

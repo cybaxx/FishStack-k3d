@@ -1,0 +1,28 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: danger
+  namespace: flux-system
+spec:
+  interval: 10m
+  path: ./services/danger/k8s/overlays/prod
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: danger-web
+      namespace: wetfish-prod
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: danger-mysql
+      namespace: wetfish-prod
+  timeout: 5m
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
+  dependsOn:
+    - name: infrastructure

@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wiki-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: wetfish-letsencrypt
+spec:
+  tls:
+  - hosts:
+    - wiki.staging.wetfish.net
+    secretName: wiki-tls
+  rules:
+  - host: wiki.staging.wetfish.net
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: wiki-web
+            port:
+              number: 80

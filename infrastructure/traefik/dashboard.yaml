@@ -7,7 +7,12 @@ metadata:
     app: traefik
   annotations:
     kubernetes.io/ingress.class: traefik
+    cert-manager.io/cluster-issuer: wetfish-selfsigned
 spec:
+  tls:
+  - hosts:
+    - traefik.wetfish.local
+    secretName: traefik-dashboard-tls
   rules:
   - host: traefik.wetfish.local
     http:

@@ -1,0 +1,134 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: wiki-nginx
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: wiki-nginx
+  filterTags:
+    pattern: "^staging-nginx-(?P<ts>\\d+)$"
+    extract: "$ts"
+  policy:
+    numerical:
+      order: asc
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: wiki-php
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: wiki-php
+  filterTags:
+    pattern: "^staging-php-(?P<ts>\\d+)$"
+    extract: "$ts"
+  policy:
+    numerical:
+      order: asc
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: home-app
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: home-app
+  filterTags:
+    pattern: "^staging-app-(?P<ts>\\d+)$"
+    extract: "$ts"
+  policy:
+    numerical:
+      order: asc
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: glitch-nginx
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: glitch-nginx
+  filterTags:
+    pattern: "^staging-nginx-(?P<ts>\\d+)$"
+    extract: "$ts"
+  policy:
+    numerical:
+      order: asc
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: glitch-php
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: glitch-php
+  filterTags:
+    pattern: "^staging-php-(?P<ts>\\d+)$"
+    extract: "$ts"
+  policy:
+    numerical:
+      order: asc
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: click-nginx
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: click-nginx
+  filterTags:
+    pattern: "^staging-nginx-(?P<ts>\\d+)$"
+    extract: "$ts"
+  policy:
+    numerical:
+      order: asc
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: click-php
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: click-php
+  filterTags:
+    pattern: "^staging-php-(?P<ts>\\d+)$"
+    extract: "$ts"
+  policy:
+    numerical:
+      order: asc
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: danger-nginx
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: danger-nginx
+  filterTags:
+    pattern: "^staging-nginx-(?P<ts>\\d+)$"
+    extract: "$ts"
+  policy:
+    numerical:
+      order: asc
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: danger-php
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: danger-php
+  filterTags:
+    pattern: "^staging-php-(?P<ts>\\d+)$"
+    extract: "$ts"
+  policy:
+    numerical:
+      order: asc

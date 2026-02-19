@@ -1,443 +1,226 @@
-# 🏗️ Architecture Design
+# Architecture Design
 
-> Kubernetes architecture design for wetfish web-services migration with complete observability stack.
+Kubernetes architecture for the wetfish web-services migration with multi-environment support and full observability.
 
 ---
 
-## 🎯 Architecture Overview
+## High-Level Design
 
-### **High-Level Design**
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    k3d Cluster Environment                      │
-├─────────────────────────────────────────────────────────────────┤
-│  wetfish-system   │  wetfish-dev  │ wetfish-monitoring          │
-│  (Traefik)        │  (Services)   │  (Observability)            │
-│  ├─ Ingress       │  ├─ Wiki      │  ├─ Prometheus              │
-│  ├─ CertManager   │  ├─ Forum     │  ├─ Grafana                 │
-│  └─ DNS           │  ├─ Home      │  ├─ Loki                    │
-│                   │  ├─ Danger    │  ├─ Tempo                   │
-│                   │  └─ Click     │  └─ AlertManager            │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### **Migration Strategy**
-```
-Docker Compose → Kubernetes → Production K8s
-      │              │              │
-  Current State   Development    Target State
+                         k3d Cluster (wetfish-dev)
++------------------------------------------------------------------------+
+| wetfish-system     | wetfish-dev        | wetfish-monitoring            |
+| (Infrastructure)   | (Applications)     | (Observability)               |
+| - Traefik Ingress  | - Wiki             | - Prometheus + Grafana        |
+| - Cert-Manager     | - Home             | - Alertmanager                |
+|                    | - Glitch           | - Loki + Promtail             |
+|                    | - Click            | - Tempo                       |
+|                    | - Danger           |                               |
++------------------------------------------------------------------------+
+| wetfish-staging    | wetfish-prod       |                               |
+| (Staging apps)     | (Production apps)  |                               |
++------------------------------------------------------------------------+
 ```
 
 ---
 
-## 🌐 Network Architecture
+## Network Architecture
 
-### **Cluster Networking**
 ```
-┌─────────────────────────────────────────────────────┐
-│                  k3d Cluster                        │
-├─────────────────────────────────────────────────────┤
-│  Load Balancer (Port 8080/8443)                     │
-│         │                                           │
-│  ┌─────▼─────┐                                      │
-│  │  Traefik  │ ← Ingress Controller                 │
-│  │  Ingress  │   - HTTP/HTTPS termination           │
-│  └─────┬─────┘   - SSL certificates                 │
-│         │                                           │
-│  ┌──────▼───────┐                                   │
-│  │  Namespaces  │                                   │
-│  ├─────────────┤                                    │
-│  │ wetfish-dev │ ← Application Services             │
-│  │ monitoring  │ ← Observability Stack              │
-│  │ system      │ ← Core Infrastructure              │
-│  └─────────────┘                                    │
-└─────────────────────────────────────────────────────┘
-```
+Browser -> localhost:8080 -> k3d Load Balancer -> Traefik -> Ingress -> Service -> Pod
 
-### **Service Communication**
-```
-Internet → Cloudflare → k3d LoadBalancer → Traefik → Services
-
-Internal Routes:
-- wiki.wetfish.local → wetfish-dev/wiki-web
-- home.wetfish.local → wetfish-dev/home-web
-- glitch.wetfish.local → wetfish-dev/glitch-web
-- click.wetfish.local → wetfish-dev/click-web
-- danger.wetfish.local → wetfish-dev/danger-web
-- grafana.wetfish.local → wetfish-monitoring/grafana
-- prometheus.wetfish.local → wetfish-monitoring/prometheus
+Dev Routes:
+  wiki.wetfish.local      -> wetfish-dev/wiki-web
+  home.wetfish.local      -> wetfish-dev/home
+  glitch.wetfish.local    -> wetfish-dev/glitch-web
+  click.wetfish.local     -> wetfish-dev/click-web
+  danger.wetfish.local    -> wetfish-dev/danger-web
+  grafana.wetfish.local   -> wetfish-monitoring/prometheus-grafana
+  prometheus.wetfish.local -> wetfish-monitoring/prometheus-kube-prometheus-prometheus
+  alertmanager.wetfish.local -> wetfish-monitoring/prometheus-kube-prometheus-alertmanager
 ```
 
 ---
 
-## 🏛️ Namespace Architecture
+## Namespace Architecture
 
-### **wetfish-system**
-```yaml
-Purpose: Core infrastructure components
-Components:
-  - Traefik Ingress Controller
-  - Cert-Manager (future)
-  - Cluster DNS configuration
-  - Storage classes
+### wetfish-system
+Core infrastructure components:
+- Traefik v3.5 Ingress Controller (deployed by k3d, watches all namespaces)
+- Cert-Manager (Helm, self-signed ClusterIssuer for dev)
 
-Resources:
-  - IngressClass: traefik
-  - StorageClass: local-path
-  - Network policies (future)
+### wetfish-dev
+Development application services:
+- **Wiki** - Custom PHP 8.2 + nginx sidecar + MariaDB 10.10
+- **Home** - SvelteKit static site served by nginx (single container)
+- **Glitch** - PHP 5.6 + nginx sidecar (no database)
+- **Click** - PHP 5.6 + nginx sidecar + MariaDB 10.10
+- **Danger** - PHP 5.6 + nginx sidecar + MariaDB 10.10
+
+### wetfish-staging / wetfish-prod
+Same services, different image tags and hostnames (via Kustomize overlays).
+
+### wetfish-monitoring
+Observability stack (all deployed via Helm):
+- Prometheus (metrics collection, ServiceMonitor discovery)
+- Grafana (visualization, pre-configured datasources)
+- Alertmanager (alert routing)
+- Loki (log aggregation, SingleBinary mode)
+- Tempo (distributed tracing)
+- Promtail (log collector DaemonSet)
+- Node Exporter + Kube State Metrics
+
+---
+
+## Service Architecture
+
+### Sidecar Pattern (Wiki, Click, Danger, Glitch)
+
+```
+Pod: <service>-web
++----------------------------+
+| Init Container             |
+| (copies src to shared vol) |
++----------------------------+
+| Container: nginx           | <- serves static files, proxies PHP to fpm
+| Container: php-fpm         | <- runs PHP application
++----------------------------+
+| Shared Volume: wwwroot     |
++----------------------------+
 ```
 
-### **wetfish-monitoring**
-```yaml
-Purpose: Observability and alerting
-Components:
-  - Prometheus (metrics collection)
-  - Grafana (visualization)
-  - Loki (log aggregation)
-  - Tempo (distributed tracing)
-  - AlertManager (alert routing)
+### Single Container Pattern (Home)
 
-Resources:
-  - ServiceMonitors: Application metrics
-  - PrometheusRules: Alert definitions
-  - Dashboards: Grafana visualizations
+```
+Pod: home
++----------------------------+
+| Container: nginx           | <- serves pre-built SvelteKit static files
++----------------------------+
 ```
 
-### **wetfish-dev**
-```yaml
-Purpose: Development applications
-Components:
-  - Wiki (Custom PHP 8.2 app with nginx + php-fpm sidecar + MariaDB)
-  - Home (Static SvelteKit site served by nginx)
-  - Glitch (PHP 5.6 + nginx sidecar, no database)
-  - Click (PHP 5.6 + nginx sidecar + MariaDB)
-  - Danger (PHP 5.6 + nginx sidecar + MariaDB)
-  - Forum (SMF 2.1.6 + PHP 8.4 + MariaDB) - Deferred
+### Database Pattern (Wiki, Click, Danger)
 
-Resources:
-  - Deployments: Application containers (sidecar pattern for PHP services)
-  - Services: Internal communication
-  - PersistentVolumes: Database storage, uploads, wwwroot
-  - ConfigMaps: nginx.conf, php.ini, php-fpm pool config
-  - Secrets: Database credentials, application passwords
+```
+Deployment: <service>-mysql
++----------------------------+
+| Container: mariadb:10.10   |
+| Strategy: Recreate         | <- required for RWO PVC
+| PVC: <service>-mysql-pvc   |
++----------------------------+
 ```
 
 ---
 
-## 📊 Data Flow Architecture
+## Kustomize Structure
 
-### **Application Flow**
+Each service uses base + overlays:
+
 ```
-┌──────────┐    HTTP/HTTPS     ┌──────────┐    Service  ┌──────────┐
-│  User    │ ────────────────► │ Traefik  │ ───────────►│  Wiki    │
-│ Request  │                   │ Ingress  │             │ Service  │
-└──────────┘                   └────┬─────┘             └────┬─────┘
-                                    │                        │
-                               ┌───▼───────────────────────▼───┐
-                               │        Metrics Export         │
-                               └───────────┬───────────────────┘
-                                           │
-                                   ┌───────▼───────┐
-                                   │   Prometheus  │
-                                   │    Scrapes    │
-                                   └───────┬───────┘
-                                           │
-                                   ┌───────▼───────┐
-                                   │    Grafana    │
-                                   │  Dashboards   │
-                                   └───────────────┘
+services/<name>/k8s/
+  base/
+    kustomization.yaml      # Lists all base resources
+    configmap.yaml          # nginx.conf, php.ini (services with configs)
+    mysql.yaml              # DB Deployment + Service + PVC (wiki, click, danger)
+    mysql-config.yaml       # DB ConfigMap (wiki, click, danger)
+    web.yaml                # Web Deployment + Service + PVCs
+    ingress.yaml            # Ingress with placeholder host
+    monitoring.yaml         # ServiceMonitors (wiki only currently)
+  overlays/
+    dev/                    # namespace: wetfish-dev, local registry, *.wetfish.local
+    staging/                # namespace: wetfish-staging, GHCR, *.staging.wetfish.net
+    prod/                   # namespace: wetfish-prod, GHCR, *.wetfish.net
 ```
 
-### **Logging Architecture**
-```
-Application → stdout/stderr → Docker → Fluent Bit → Loki → Grafana
-```
-
-### **Tracing Architecture**
-```
-Application → OpenTelemetry → Collector → Tempo → Grafana
-```
+Base manifests use placeholder image names (e.g., `WIKI_NGINX_IMAGE:latest`) replaced by Kustomize `images` transformers. Overlays set namespace, images, TLS/ingress hostnames, `SITE_URL`, and `storageClassName`.
 
 ---
 
-## 🔧 Component Design
+## Environments
 
-### **Ingress Controller (Traefik v2)**
-```yaml
-Configuration:
-  - Docker provider for k3d
-  - File provider for static routes
-  - Cloudflare DNS integration
-  - SSL certificate automation
-  - Middleware for security
-
-Features:
-  - HTTP to HTTPS redirect
-  - Path-based routing
-  - Load balancing
-  - Rate limiting (future)
-  - IP whitelisting (Cloudflare)
-```
-
-### **Database Architecture**
-```yaml
-Services:
-  Wiki:
-    - MariaDB 10.10 (utf8, wiki-mysql deployment)
-    - PersistentVolume: 2GB (dev)
-    - Strategy: Recreate (RWO PVC)
-
-  Click:
-    - MariaDB 10.10 (latin1/MyISAM, click-mysql deployment)
-    - PersistentVolume: 2GB (dev)
-    - Strategy: Recreate (RWO PVC)
-
-  Danger:
-    - MariaDB 10.10 (utf8/MyISAM, danger-mysql deployment)
-    - PersistentVolume: 2GB (dev)
-    - Strategy: Recreate (RWO PVC)
-
-Storage Strategy:
-  - LocalPath provisioner (development)
-  - NFS mounts (production planning)
-  - Automated backup to cloud storage
-```
-
-### **Application Containers**
-```yaml
-Wiki Service (PHP 8.2):
-  - Custom PHP application (NOT MediaWiki)
-  - PHP-FPM 8.2 (Debian bookworm)
-  - Nginx: Alpine (sidecar)
-  - PVCs: wwwroot (2Gi), uploads (5Gi)
-
-PHP 5.6 Services (click, danger, glitch):
-  - php:5.6-fpm-alpine base image
-  - Nginx: 1.25-alpine (sidecar)
-  - Extensions: mysqli, mysql
-
-Home Service:
-  - SvelteKit (Node 20 build) → static nginx:1.25-alpine
-  - No sidecar, single container
-```
+| Environment | Namespace | Hostnames | Registry | Branch | TLS Issuer |
+|-------------|-----------|-----------|----------|--------|------------|
+| dev | wetfish-dev | `*.wetfish.local` | `wetfish-registry:5000` (k3d local) | local builds | `wetfish-selfsigned` |
+| staging | wetfish-staging | `*.staging.wetfish.net` | `ghcr.io/cybaxx/web-services-k8s` | `main` | `wetfish-letsencrypt` |
+| prod | wetfish-prod | `*.wetfish.net` | `ghcr.io/cybaxx/web-services-k8s` | `release` | `wetfish-letsencrypt` |
 
 ---
 
-## 📈 Monitoring Architecture
+## CI/CD Pipeline
 
-### **Metrics Collection**
 ```
-Applications → Prometheus Exporters → Scrape → Storage → Query → Grafana
-             ↑                      ↑
-         ServiceMonitors     PrometheusOperator
-```
-
-### **Alert Management**
-```
-Prometheus Rules → AlertManager → Routes → IRC/Webhook → Notifications
+Push to main/release -> GitHub Actions -> Build Docker images -> Push to GHCR
+                                       -> Tag: staging-<component> (main)
+                                       -> Tag: prod-<component> (release)
 ```
 
-### **Dashboard Architecture**
-```
-Grafana Dashboards:
-├── Cluster Overview
-│   ├── Node Health
-│   ├── Resource Usage
-│   └── Network Performance
-├── Application Metrics
-│   ├── Wiki Performance
-│   ├── Database Health
-│   └── User Activity
-└── System Monitoring
-    ├── Container Resources
-    ├── Log Analysis
-    └── Alert Status
-```
+Reusable workflow pattern (`.github/workflows/build-service.yml`) called by per-service trigger workflows. Each triggers on path changes under `services/<name>/**`.
 
 ---
 
-## 🚀 Deployment Architecture
+## Monitoring Architecture
 
-### **CI/CD Pipeline**
 ```
-GitHub Repository → GitHub Actions → Container Build → GHCR Push → k3d Deploy
-                                    │              │             │
-                            ┌───────▼───────┐ ┌────▼────┐ ┌──────▼──────┐
-                            │  Build/Test   │ │ Registry│ │  Deploy     │
-                            │  Lint/Scan    │ │ Push    │ │  Verify     │
-                            └───────────────┘ └─────────┘ └─────────────┘
+                    Prometheus
+                   /    |     \
+        scrapes   /     |      \  scrapes
+                 /      |       \
+  Node Exporter   kube-state   ServiceMonitors
+                  -metrics     (wiki-web, wiki-mysql)
+                        |
+                   Alertmanager
+                        |
+                     Grafana  <--- Loki  <--- Promtail (DaemonSet)
+                        |
+                      Tempo  <--- OTLP (future app instrumentation)
 ```
 
-### **Environment Strategy**
-```
-Development (k3d) → Staging (k3s) → Production (k3s on cloud)
-      │                    │                    │
-  Local testing      Pre-production    Production services
-  Rapid iteration   Integration tests  High availability
-```
+Prometheus discovers ServiceMonitors across all namespaces. Promtail ships container logs from all nodes to Loki. Grafana has all datasources pre-configured.
 
 ---
 
-## 🔐 Security Architecture
+## Infrastructure Components
 
-### **Network Security**
-```yaml
-Development:
-  - Cluster isolation (local only)
-  - Basic network policies
-  - Default deny (future)
+### Traefik Ingress Controller
+- Deployed by k3d (v3.5, Helm chart in kube-system)
+- Watches Ingress resources across all namespaces
+- HTTP(8080) and HTTPS(8443) ports exposed via k3d load balancer
 
-Production Planning:
-  - Namespace isolation
-  - Service mesh (Istio)
-  - Egress filtering
-  - Ingress security
-```
+### Cert-Manager
+- Deployed via Helm into `cert-manager` namespace
+- Self-signed ClusterIssuer (`wetfish-selfsigned`) for dev
+- Let's Encrypt ClusterIssuer (`wetfish-letsencrypt`) for staging/prod
 
-### **Secret Management**
-```yaml
-Development:
-  - K8s secrets (base64)
-  - Environment files
-  - Local development
+### Local Registry
+- k3d-managed registry on port 5000
+- External: `localhost:5000` (for `docker push`)
+- In-cluster: `wetfish-registry:5000` (for Kubernetes image pulls)
 
-Production Planning:
-  - External secret store
-  - Sealed secrets
-  - Automatic rotation
-  - Audit logging
-```
+### Storage
+- `local-path` StorageClass (k3d/k3s built-in, dev only)
+- Set via Kustomize overlay env-patch (not hardcoded in base)
 
 ---
 
-## 📁 Service Architecture Details
+## Database Architecture
 
-### **Wiki Service**
-```yaml
-Architecture:
-  Frontend: Nginx (Alpine) - sidecar container
-  Backend: PHP-FPM 8.2 (Debian bookworm)
-  Database: MariaDB 10.10
-  Deployment: wiki-web (sidecar), wiki-mysql
-  Storage: wwwroot PVC (2Gi), uploads PVC (5Gi), mysql PVC (2Gi)
+| Service | Engine | Character Set | Collation | Storage |
+|---------|--------|--------------|-----------|---------|
+| Wiki | MariaDB 10.10 | utf8mb4 | utf8mb4_general_ci | 2Gi PVC |
+| Click | MariaDB 10.10 | latin1 | latin1_swedish_ci | 2Gi PVC |
+| Danger | MariaDB 10.10 | utf8 | utf8_general_ci | 2Gi PVC |
 
-Configuration:
-  ConfigMap: nginx.conf, php.ini, php-fpm-pool.conf
-  Secret: Database credentials
-  Service: wiki-web (ClusterIP), wiki-mysql (ClusterIP)
-  Ingress: wiki.wetfish.local
-```
-
-### **Traefik Ingress**
-```yaml
-Configuration:
-  Static config: Entrypoints, providers
-  Dynamic config: Routers, services, middleware
-  Storage: ConfigMaps, secrets
-  Networking: LoadBalancer service
-
-Features:
-  - SSL termination
-  - Path routing
-  - Load balancing
-  - Health checks
-  - Metrics export
-```
+All MySQL deployments use `strategy: Recreate` (required for RWO PVCs). `sql_mode = ""` set for legacy PHP compatibility.
 
 ---
 
-## 🎛️ Configuration Management
+## Architecture Decisions
 
-### **Environment Variables**
-```yaml
-Categories:
-  - Database credentials (Secret)
-  - External API keys (Secret)
-  - Service URLs (ConfigMap)
-  - Feature flags (ConfigMap)
-  - Resource limits (Deployment)
-```
-
-### **Resource Allocation**
-```yaml
-Development Cluster:
-  Wiki Service: 512MB RAM, 0.5 CPU
-  Database: 1GB RAM, 1 CPU, 10GB storage
-  Monitoring: 2GB RAM, 2 CPU total
-  Infrastructure: 512MB RAM, 0.5 CPU
-
-Production Planning:
-  - Autoscaling configuration
-  - Resource quotas
-  - Priority classes
-  - Node taints/tolerations
-```
-
----
-
-## 🔮 Future Architecture
-
-### **Multi-Cluster Setup**
-```
-Production:
-  - Multiple AZs
-  - Cluster federation
-  - Service mesh
-  - Global load balancing
-```
-
-### **Advanced Features**
-```
-- GitOps with ArgoCD
-- Service mesh with Istio
-- Advanced security policies
-- Automated scaling
-- Disaster recovery
-```
-
----
-
-## 📋 Architecture Decisions
-
-### **Why k3d for Development?**
-- Docker-native, no system impact
-- Easy cluster lifecycle management
-- Perfect for local development
-- Low resource overhead
-
-### **Why Traefik?**
-- Native Docker/Kubernetes integration
-- Automatic SSL certificate management
-- Cloudflare integration
-- Built-in metrics and health checks
-
-### **Why Prometheus/Grafana?**
-- Proven monitoring stack
-- Rich ecosystem of exporters
-- Powerful visualization
-- Active community support
-
----
-
-## 🎯 Success Metrics
-
-### **Performance Targets**
-- Application response time: <200ms
-- Database query time: <100ms
-- Cluster resource utilization: <70%
-- Monitoring alert response: <5min
-
-### **Availability Goals**
-- Development uptime: 90%+
-- Staging uptime: 99%+
-- Production uptime: 99.9%+
-
-### **Development Velocity**
-- Local setup time: <10min
-- Deployment time: <5min
-- Rollback time: <2min
-- Test execution: <3min
-
----
-
-*Architecture document v1.0 - Last Updated: $(date)*
+| Decision | Rationale |
+|----------|-----------|
+| k3d for dev | Docker-native, low overhead, built-in registry and load balancer |
+| Kustomize over Helm for apps | Simpler for static PHP apps, overlays match env model well |
+| Helm for monitoring | Complex charts with many CRDs, community-maintained values |
+| Sidecar pattern | nginx + php-fpm need shared filesystem, single pod simplifies networking |
+| Traefik (k3d default) | Already integrated, watches all namespaces, no extra config needed |
+| php:5.6-fpm-alpine | Only working PHP 5.6 image (Sury/Debian repos broken for 5.6) |
+| Recreate strategy for MySQL | RWO PVC deadlock prevention (new pod can't mount until old releases) |

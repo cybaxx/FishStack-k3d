@@ -44,9 +44,15 @@ k3d version
 ### **2. Create Development Cluster**
 ```bash
 # Navigate to project directory
-cd /Users/cyba/git/web-services-k8s
+cd /path/to/web-services-k8s
 
-# Create wetfish-dev cluster
+# Full stack bring-up (cluster + infra + builds + deploy)
+./scripts/up.sh
+
+# Or with monitoring stack included
+./scripts/up.sh --with-monitoring
+
+# Or just create the cluster (no builds/deploys)
 ./scripts/setup-dev.sh
 ```
 
@@ -89,11 +95,12 @@ k3d cluster create wetfish-dev \
 
 ### **Namespace Architecture**
 ```yaml
-wetfish-system:      # Core infrastructure (Traefik, Cert-Manager)
-wetfish-monitoring:  # Observability stack
+wetfish-system:      # Core infrastructure (Traefik)
+cert-manager:        # TLS certificate management
+wetfish-monitoring:  # Observability stack (Prometheus, Grafana, Loki, Tempo, Promtail)
 wetfish-dev:         # Development applications
-wetfish-staging:     # Staging environment  
-wetfish-prod:        # Production (future)
+wetfish-staging:     # Staging applications
+wetfish-prod:        # Production applications
 ```
 
 ---
@@ -103,20 +110,40 @@ wetfish-prod:        # Production (future)
 ```
 web-services-k8s/
 ├── scripts/
-│   ├── setup-dev.sh         # Cluster creation and setup
-│   ├── deploy.sh            # Service deployment
+│   ├── up.sh                # Full stack bring-up (one command)
+│   ├── setup-dev.sh         # Cluster creation only
+│   ├── deploy.sh            # Service deployment (--env dev|staging|prod)
+│   ├── generate-secrets.sh  # Secret generation per environment
 │   ├── cleanup.sh           # Cluster teardown
-│   └── backup.sh            # Data backup procedures
+│   ├── setup-hosts.sh       # /etc/hosts management
+│   └── test-deployment.sh   # Health checks
 ├── infrastructure/
-│   ├── namespaces.yaml      # Namespace definitions
-│   └── traefik/           # Ingress controller config
+│   ├── namespaces.yaml      # Namespace definitions (dev, staging, prod, system, monitoring)
+│   ├── traefik/             # Traefik raw manifests
+│   └── cert-manager/        # ClusterIssuer definitions
 ├── monitoring/
-│   ├── manifests/          # Prometheus, Grafana, etc.
-│   ├── configs/           # Configuration files
-│   └── grafana/          # Dashboard definitions
+│   └── values/              # Helm values for monitoring stack
+│       ├── prometheus-stack-values.yaml
+│       ├── loki-values.yaml
+│       ├── tempo-values.yaml
+│       └── promtail-values.yaml
 ├── services/
-│   └── wiki/              # Wiki service manifests
-└── docs/                  # Documentation
+│   ├── wiki/                # Wiki service
+│   ├── home/                # Home service
+│   ├── glitch/              # Glitch service
+│   ├── click/               # Click service
+│   └── danger/              # Danger service
+│   # Each service has:
+│   #   src/          - Git submodule (upstream source)
+│   #   k8s/base/     - Kustomize base manifests
+│   #   k8s/overlays/ - dev/staging/prod overlays
+│   #   Dockerfile.*  - Container definitions
+│   #   config/       - nginx.conf, php.ini, etc.
+├── .github/workflows/       # CI/CD workflows
+│   ├── build-service.yml    # Reusable workflow
+│   ├── build-wiki.yml       # Per-service triggers
+│   └── ...
+└── docs/                    # Documentation
 ```
 
 ---

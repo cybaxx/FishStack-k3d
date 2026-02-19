@@ -1,0 +1,20 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: home
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: ./services/home/k8s/overlays/staging
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: home-web
+      namespace: wetfish-staging
+  timeout: 5m
+  dependsOn:
+    - name: infrastructure

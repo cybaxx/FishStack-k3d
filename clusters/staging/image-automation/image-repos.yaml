@@ -1,0 +1,98 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: wiki-nginx
+  namespace: flux-system
+spec:
+  image: ghcr.io/cybaxx/web-services-k8s/wiki
+  interval: 5m
+  filterTags:
+    pattern: "^staging-nginx-\\d+$"
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: wiki-php
+  namespace: flux-system
+spec:
+  image: ghcr.io/cybaxx/web-services-k8s/wiki
+  interval: 5m
+  filterTags:
+    pattern: "^staging-php-\\d+$"
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: home-app
+  namespace: flux-system
+spec:
+  image: ghcr.io/cybaxx/web-services-k8s/home
+  interval: 5m
+  filterTags:
+    pattern: "^staging-app-\\d+$"
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: glitch-nginx
+  namespace: flux-system
+spec:
+  image: ghcr.io/cybaxx/web-services-k8s/glitch
+  interval: 5m
+  filterTags:
+    pattern: "^staging-nginx-\\d+$"
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: glitch-php
+  namespace: flux-system
+spec:
+  image: ghcr.io/cybaxx/web-services-k8s/glitch
+  interval: 5m
+  filterTags:
+    pattern: "^staging-php-\\d+$"
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: click-nginx
+  namespace: flux-system
+spec:
+  image: ghcr.io/cybaxx/web-services-k8s/click
+  interval: 5m
+  filterTags:
+    pattern: "^staging-nginx-\\d+$"
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: click-php
+  namespace: flux-system
+spec:
+  image: ghcr.io/cybaxx/web-services-k8s/click
+  interval: 5m
+  filterTags:
+    pattern: "^staging-php-\\d+$"
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: danger-nginx
+  namespace: flux-system
+spec:
+  image: ghcr.io/cybaxx/web-services-k8s/danger
+  interval: 5m
+  filterTags:
+    pattern: "^staging-nginx-\\d+$"
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: danger-php
+  namespace: flux-system
+spec:
+  image: ghcr.io/cybaxx/web-services-k8s/danger
+  interval: 5m
+  filterTags:
+    pattern: "^staging-php-\\d+$"

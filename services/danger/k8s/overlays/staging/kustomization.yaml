@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: wetfish-staging
+resources:
+  - ../../base
+images:
+  - name: DANGER_NGINX_IMAGE
+    newName: ghcr.io/cybaxx/web-services-k8s/danger
+    newTag: staging-nginx
+  - name: DANGER_PHP_IMAGE
+    newName: ghcr.io/cybaxx/web-services-k8s/danger
+    newTag: staging-php
+patches:
+  - path: ingress-patch.yaml
+  - path: env-patch.yaml

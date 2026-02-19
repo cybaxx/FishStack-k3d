@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: home-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: wetfish-letsencrypt
+spec:
+  tls:
+  - hosts:
+    - home.staging.wetfish.net
+    secretName: home-tls
+  rules:
+  - host: home.staging.wetfish.net
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: home-web
+            port:
+              number: 80

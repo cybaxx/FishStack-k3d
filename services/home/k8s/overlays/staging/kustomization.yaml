@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: wetfish-staging
+resources:
+  - ../../base
+images:
+  - name: HOME_IMAGE
+    newName: ghcr.io/cybaxx/web-services-k8s/home
+    newTag: staging-app
+patches:
+  - path: ingress-patch.yaml

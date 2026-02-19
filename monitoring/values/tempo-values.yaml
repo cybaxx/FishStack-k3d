@@ -1,57 +1,46 @@
-# Tempo Helm values
-# Tempo is a distributed tracing backend designed to work with Grafana
-
-# Deployment mode
-deploymentMode: SingleBinary
+# Tempo Helm values (dev)
+# Distributed tracing backend for the wetfish k3d cluster
+# Chart: grafana/tempo v1.x (single binary mode)
 
 tempo:
-  # Retention period (24 hours for dev)
   retention: 24h
-
-  # Storage configuration
   storage:
     trace:
       backend: local
       local:
         path: /var/tempo/traces
 
-  # Query frontend
-  queryFrontend:
-    query:
-      enabled: true
+# Resources
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "50m"
+  limits:
+    memory: "256Mi"
+    cpu: "300m"
 
-# Single binary deployment
-singleBinary:
-  replicas: 1
+# Persistence
+persistence:
+  enabled: true
+  size: 5Gi
+  storageClassName: local-path
 
-  # Resource limits
-  resources:
-    requests:
-      memory: "256Mi"
-      cpu: "100m"
-    limits:
-      memory: "512Mi"
-      cpu: "500m"
+# Receivers (OTLP)
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:4317"
+      http:
+        endpoint: "0.0.0.0:4318"
 
-  # Persistence
-  persistence:
-    enabled: true
-    size: 10Gi
-    storageClass: local-path
-
-# Service configuration
+# Service
 service:
   type: ClusterIP
 
-# Ingress
+# Ingress not needed (Grafana accesses directly)
 ingress:
-  enabled: true
-  ingressClassName: traefik
-  hosts:
-    - host: tempo.wetfish.local
-      paths:
-        - path: /
-          pathType: Prefix
+  enabled: false
 
 # Gateway
 gateway:

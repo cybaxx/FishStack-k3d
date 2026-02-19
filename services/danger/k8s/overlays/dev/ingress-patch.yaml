@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: danger-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: wetfish-selfsigned
+spec:
+  tls:
+  - hosts:
+    - danger.wetfish.local
+    secretName: danger-tls
+  rules:
+  - host: danger.wetfish.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: danger-web
+            port:
+              number: 80

@@ -17,6 +17,22 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
+  name: wetfish-staging
+  labels:
+    name: wetfish-staging
+    purpose: staging
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: wetfish-prod
+  labels:
+    name: wetfish-prod
+    purpose: production
+---
+apiVersion: v1
+kind: Namespace
+metadata:
   name: wetfish-monitoring
   labels:
     name: wetfish-monitoring

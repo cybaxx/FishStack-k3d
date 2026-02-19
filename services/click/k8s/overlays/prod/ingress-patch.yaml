@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: click-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: wetfish-letsencrypt
+spec:
+  tls:
+  - hosts:
+    - click.wetfish.net
+    secretName: click-tls
+  rules:
+  - host: click.wetfish.net
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: click-web
+            port:
+              number: 80

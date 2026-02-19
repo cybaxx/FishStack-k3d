@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: glitch-nginx-config
+  labels:
+    app: glitch
+    component: web
+data:
+  nginx.conf: |
+    server {
+        listen 80;
+
+        index index.php index.html;
+        root /var/www;
+
+        # Security headers
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+
+        # Block sensitive files
+        location ~ /\.(git|env|htaccess|htpasswd) {
+            deny all;
+            return 404;
+        }
+
+        location / {
+            autoindex off;
+            try_files $uri $uri/ /index.php?hash=$uri;
+        }
+
+        location ~ \.php$ {
+            fastcgi_split_path_info ^(.+\.php)(/.+)$;
+            # Use localhost since php-fpm runs in the same pod (sidecar)
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_index index.php;
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        }
+    }

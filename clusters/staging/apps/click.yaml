@@ -1,0 +1,28 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: click
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: ./services/click/k8s/overlays/staging
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: click-web
+      namespace: wetfish-staging
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: click-mysql
+      namespace: wetfish-staging
+  timeout: 5m
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
+  dependsOn:
+    - name: infrastructure

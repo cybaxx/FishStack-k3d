@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: wetfish-dev
+resources:
+  - ../../base
+  - secret.yaml
+images:
+  - name: DANGER_NGINX_IMAGE
+    newName: wetfish-registry:5000/danger
+    newTag: nginx
+  - name: DANGER_PHP_IMAGE
+    newName: wetfish-registry:5000/danger
+    newTag: php
+patches:
+  - path: ingress-patch.yaml
+  - path: env-patch.yaml

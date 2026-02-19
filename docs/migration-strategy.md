@@ -101,7 +101,27 @@ k3d Cluster
 
 ---
 
-### **Phase 4: Production Ready**
+### **Phase 4: CI/CD and Multi-Environment** ✅
+**Goal**: Full CI/CD pipeline and multi-environment support
+
+#### **Tasks**
+- [x] Restructure manifests into Kustomize base + overlays (dev/staging/prod)
+- [x] Add GitHub Actions workflows for all 5 services (reusable workflow pattern)
+- [x] Add wetfish-staging and wetfish-prod namespaces
+- [x] Update deploy.sh with `--env` flag and Kustomize overlay support
+- [x] Update generate-secrets.sh for per-environment secret generation
+- [x] Create `up.sh` single bring-up script for full dev stack
+- [x] Deploy monitoring stack (Prometheus, Grafana, Loki, Tempo, Promtail)
+
+#### **Deliverables**
+- Kustomize overlays for all 5 services x 3 environments (15 overlays)
+- Reusable CI workflow (`.github/workflows/build-service.yml`) + 5 trigger workflows
+- `scripts/up.sh` for one-command dev stack bring-up
+- Full observability stack in `wetfish-monitoring` namespace
+
+---
+
+### **Phase 5: Production Ready**
 **Goal**: Security hardening, backups, production cluster
 
 #### **Tasks**
@@ -111,24 +131,17 @@ k3d Cluster
 - [ ] Add network policies
 - [ ] Add security contexts to all deployments
 - [ ] Implement backup and restore procedures
-- [ ] Set up staging environment
+- [ ] Deploy to staging environment and validate
 
 ---
 
-### **Phase 5: CI/CD and GitOps**
-**Goal**: Full automation and multi-environment support
+### **Phase 6: Forum and GitOps**
+**Goal**: Forum migration and GitOps automation
 
 #### **Tasks**
-- [ ] Add GitHub Actions workflows for all services
-- [ ] Configure automated testing
-- [ ] Implement rolling deployments
+- [ ] Migrate SMF 2.1.6 forum service
 - [ ] Set up GitOps with ArgoCD
-- [ ] Configure promotion to production
-
-#### **Deliverables**
-- Fully automated deployment pipeline
-- Multi-environment support
-- Production-ready configuration
+- [ ] Configure automated promotion to production
 
 ---
 
@@ -209,31 +222,18 @@ Kubernetes:
 
 ---
 
-### **Forum Service Migration**
+### **Forum Service Migration** (deferred)
 
-#### **Current Architecture**
-```yaml
-Docker Compose:
-  forum:
-    build: ./forum
-    ports: ["3000:3000"]
-    environment:
-      DATABASE_URL: postgresql://user:pass@forum-db:5432/forum
-  
-  forum-db:
-    image: postgres:15
-    environment:
-      POSTGRES_DB: forum
-      POSTGRES_USER: forum
-      POSTGRES_PASSWORD: ${FORUM_DB_PASSWORD}
-    volumes: ["./forum-db:/var/lib/postgresql/data"]
-```
+#### **Target Architecture**
+- SMF 2.1.6 (Simple Machines Forum) - PHP 8.4 application
+- MariaDB database backend
+- nginx + php-fpm sidecar pattern (same as other PHP services)
 
 #### **Migration Considerations**
-- PostgreSQL to PostgreSQL migration (simpler)
-- Node.js application containerization
-- Database connection string management
-- Session storage and caching
+- Complex build chain (composer, custom SMF mods)
+- PHP 8.4 requirement (newer than other services)
+- Large existing database with user data
+- Session storage and attachment handling
 
 ---
 
@@ -414,8 +414,10 @@ echo "All tests passed!"
 
 ### **Post-Migration**
 - [x] Health checks passing (liveness/readiness probes on all pods)
-- [x] Monitoring ServiceMonitor configured (wiki)
-- [ ] Alert rules active
+- [x] Monitoring stack deployed (Prometheus, Grafana, Loki, Tempo, Promtail)
+- [x] ServiceMonitors configured (wiki-web, wiki-mysql)
+- [x] Promtail shipping container logs from all nodes to Loki
+- [ ] Custom alert rules active
 - [x] Documentation updated
 - [ ] Old Docker Compose system decommissioned
 
@@ -486,7 +488,7 @@ gantt
 ### **Phase 0 Complete** ✅
 - [x] k3d cluster running with Traefik ingress
 - [x] Local registry on port 5000
-- [x] Monitoring Helm values created
+- [x] Monitoring stack Helm values and deployment
 - [x] Setup, deploy, cleanup, hosts, and test scripts
 
 ### **Phase 1 Complete** ✅
@@ -504,16 +506,20 @@ gantt
 - [ ] SMF 2.1.6 forum service migrated
 - [ ] Forum database with schema loaded
 
-### **Phase 4: Production Ready** (not started)
+### **Phase 4: CI/CD & Multi-Environment** ✅
+- [x] Full CI/CD pipeline for all 5 services (reusable GitHub Actions workflow)
+- [x] Multi-environment support (dev/staging/prod Kustomize overlays)
+- [x] Monitoring stack deployed (Prometheus, Grafana, Loki, Tempo, Promtail)
+- [x] One-command dev stack bring-up (`scripts/up.sh`)
+
+### **Phase 5: Production Ready** (not started)
 - [ ] Security audit findings addressed
 - [ ] TLS/HTTPS enforced
 - [ ] Secrets management implemented
 - [ ] Backup procedures validated
 
-### **Phase 5: CI/CD & GitOps** (not started)
-- [ ] Full CI/CD pipeline for all services
-- [ ] Automated deployments working
-- [ ] Multi-environment support
+### **Phase 6: Forum & GitOps** (not started)
+- [ ] Forum service migrated
 - [ ] GitOps with ArgoCD
 
 ---
