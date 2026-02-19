@@ -8,22 +8,76 @@
 
 | | Staging | Production |
 |---|---------|------------|
+| **Server** | `ssh stage` (Debian 12 VPS, 1 vCPU, 1GB RAM) | TBD |
+| **Cluster** | k3s single-node (`--disable=traefik`) | TBD |
 | **Branch** | `main` | `release` |
 | **Namespace** | `wetfish-staging` | `wetfish-prod` |
 | **Hostnames** | `staging-<svc>.wetfish.net` / `staging.wetfish.net` | `<svc>.wetfish.net` / `wetfish.net` |
 | **Registry** | `ghcr.io/cybaxx/web-services-k8s` | `ghcr.io/cybaxx/web-services-k8s` |
 | **Image tags** | `staging-<component>` | `prod-<component>` |
-| **TLS** | cert-manager (Let's Encrypt) | cert-manager (Let's Encrypt) |
+| **TLS** | Traefik built-in ACME (behind Cloudflare proxy) | Traefik built-in ACME (behind Cloudflare proxy) |
+| **DNS** | Cloudflare proxied (orange cloud) | Cloudflare proxied (orange cloud) |
 
 ### Services
 
-| Service | Components | Has DB | Has SITE_URL |
-|---------|-----------|--------|-------------|
-| wiki | nginx, php | Yes (MariaDB) | Yes |
-| home | app | No | No |
-| glitch | nginx, php | No | No |
-| click | nginx, php | Yes (MariaDB) | No |
-| danger | nginx, php | Yes (MariaDB) | Yes |
+| Service | Components | Has DB | Has SITE_URL | Staging Status |
+|---------|-----------|--------|-------------|----------------|
+| wiki | nginx, php | Yes (MariaDB) | Yes | Deployed |
+| home | app | No | No | Pending (no GHCR image yet) |
+| glitch | nginx, php | No | No | Not deployed (RAM constrained) |
+| click | nginx, php | Yes (MariaDB) | No | Not deployed (RAM constrained) |
+| danger | nginx, php | Yes (MariaDB) | Yes | Not deployed (RAM constrained) |
+
+> **Note:** The staging server has only 1GB RAM. Currently only wiki is deployed. Adding more services requires a larger VPS or careful memory tuning.
+
+---
+
+## Staging Server Setup (One-Time)
+
+### 1. Install k3s
+
+```bash
+ssh stage "curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC='--disable=traefik' sh -"
+ssh stage "mkdir -p ~/.kube && cp /etc/rancher/k3s/k3s.yaml ~/.kube/config && chmod 600 ~/.kube/config"
+```
+
+k3s includes kubectl, local-path storage provisioner, and CoreDNS. Built-in Traefik is disabled because we deploy our own.
+
+### 2. Install Helm
+
+```bash
+ssh stage "curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash"
+```
+
+### 3. Clone/Update Repo
+
+```bash
+ssh stage "cd /opt && git clone --recurse-submodules ssh://github.com/cybaxx/web-services-k8s.git"
+# Or if already cloned:
+ssh stage "cd /opt/web-services-k8s && git pull && git submodule update --init"
+```
+
+### 4. Deploy Infrastructure
+
+```bash
+ssh stage "cd /opt/web-services-k8s && kubectl apply -f infrastructure/namespaces.yaml"
+
+# cert-manager (for future use / fallback)
+ssh stage "helm repo add jetstack https://charts.jetstack.io && helm repo update jetstack"
+ssh stage "helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --set crds.enabled=true"
+ssh stage "kubectl apply -f infrastructure/cert-manager/cluster-issuer.yaml -f infrastructure/cert-manager/letsencrypt-issuer.yaml"
+
+# Traefik (with built-in ACME for Let's Encrypt)
+ssh stage "kubectl apply -f infrastructure/traefik/ingressclass.yaml -f infrastructure/traefik/deployment.yaml"
+```
+
+### 5. Verify Infrastructure
+
+```bash
+ssh stage "kubectl get pods -n wetfish-system"        # Traefik running
+ssh stage "kubectl get pods -n cert-manager"           # cert-manager running
+ssh stage "kubectl get svc traefik -n wetfish-system"  # External IP assigned, ports 80/443
+```
 
 ---
 
@@ -31,40 +85,24 @@
 
 ### Tools Required
 ```bash
-kubectl          # Kubernetes CLI
-helm             # Helm package manager (for monitoring/cert-manager)
-gh               # GitHub CLI (optional, for checking workflow status)
+kubectl          # Kubernetes CLI (included with k3s)
+helm             # Helm package manager
 ```
 
-### Cluster Access
-Ensure your kubeconfig is pointed at the correct cluster and you have write access to the target namespace.
+### TLS / Cloudflare
 
-```bash
-# Verify cluster access
-kubectl cluster-info
-kubectl get namespace wetfish-staging
-kubectl get namespace wetfish-prod
+TLS is handled by Traefik's built-in ACME resolver with HTTP-01 challenges. Services sit behind Cloudflare proxy (orange cloud), which forwards ACME challenges to the origin server.
+
+Staging ingress patches use these Traefik annotations instead of cert-manager:
+```yaml
+annotations:
+  traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+  traefik.ingress.kubernetes.io/router.entrypoints: websecure
+spec:
+  ingressClassName: traefik
 ```
 
-### Namespaces
-Namespaces must exist before deploying. If not:
-```bash
-kubectl apply -f infrastructure/namespaces.yaml
-```
-
-### cert-manager
-TLS certificates are managed by cert-manager. Verify it's installed:
-```bash
-kubectl get pods -n cert-manager
-kubectl get clusterissuer
-```
-
-If missing, deploy it:
-```bash
-./scripts/deploy.sh cert-manager
-```
-
-> **Note:** The staging/prod ingress patches reference a `wetfish-letsencrypt` ClusterIssuer for ACME/Let's Encrypt certificates. Ensure this issuer is configured for your cluster. The default `wetfish-selfsigned` issuer is for dev only.
+> **Important:** Do NOT use `cert-manager.io/cluster-issuer` annotations on staging/prod ingresses. Traefik's built-in ACME and cert-manager will conflict if both try to manage certificates for the same domain.
 
 ---
 
@@ -77,12 +115,9 @@ Images are built automatically by GitHub Actions when code is pushed to `main`.
 Each service has a trigger workflow (e.g., `build-wiki.yml`) that calls the reusable `build-service.yml` workflow. Images are pushed to GHCR with `staging-<component>` tags.
 
 ```bash
-# Check if images were built for latest main commit
-gh run list --branch main --limit 5
-
-# Verify images exist in GHCR
-docker pull ghcr.io/cybaxx/web-services-k8s/wiki:staging-nginx
-docker pull ghcr.io/cybaxx/web-services-k8s/wiki:staging-php
+# Verify images are pullable from the stage server
+ssh stage "crictl pull ghcr.io/cybaxx/web-services-k8s/wiki:staging-nginx"
+ssh stage "crictl pull ghcr.io/cybaxx/web-services-k8s/wiki:staging-php"
 ```
 
 | Service | Image Tags |
@@ -98,87 +133,74 @@ docker pull ghcr.io/cybaxx/web-services-k8s/wiki:staging-php
 Secrets must be generated before first deploy. They are gitignored and stored locally in the overlay directory.
 
 ```bash
-# Generate with random passwords (recommended for staging)
-./scripts/generate-secrets.sh --env staging --random
+# On the stage server — generate-secrets.sh may hit SIGPIPE on Linux,
+# so generate manually if needed:
+ssh stage 'bash -c '\''
+b64() { echo -n "$1" | base64; }
+ROOT_PASS=$(openssl rand -base64 18)
+USER_PASS=$(openssl rand -base64 18)
+# ... (see scripts/generate-secrets.sh for full template)
+'\'''
 ```
 
-This creates secret files for services with databases:
-- `services/wiki/k8s/overlays/staging/secret.yaml`
-- `services/click/k8s/overlays/staging/secret.yaml`
-- `services/danger/k8s/overlays/staging/secret.yaml`
+After generating, add `secret.yaml` to the kustomization if not already present:
+```bash
+# Check and add if missing
+ssh stage "grep -q secret.yaml services/wiki/k8s/overlays/staging/kustomization.yaml || \
+  sed -i '/- ..\/..\/base/a\  - secret.yaml' services/wiki/k8s/overlays/staging/kustomization.yaml"
+```
 
 > **Important:** Save the generated passwords securely. You'll need the MySQL root passwords for schema loading.
 
 ### 3. Deploy Services
 
 ```bash
-# Deploy all services
-./scripts/deploy.sh --env staging wiki
-./scripts/deploy.sh --env staging home
-./scripts/deploy.sh --env staging glitch
-./scripts/deploy.sh --env staging click
-./scripts/deploy.sh --env staging danger
+ssh stage "cd /opt/web-services-k8s && ./scripts/deploy.sh --env staging wiki"
 ```
 
-Or deploy a single service:
-```bash
-./scripts/deploy.sh --env staging wiki
-```
+> **Note:** ServiceMonitor CRD warnings are expected (no monitoring stack on staging). These are harmless.
 
-### 4. Verify Deployment
+### 4. Load DB Schemas (First Deploy Only)
 
 ```bash
-# Check all pods
-kubectl get pods -n wetfish-staging
-
-# Check ingresses
-kubectl get ingress -n wetfish-staging
-
-# Check TLS certificates
-kubectl get certificates -n wetfish-staging
+# Get the root password from the secret
+ssh stage 'ROOT_PASS=$(kubectl get secret wiki-mysql-secret -n wetfish-staging \
+  -o jsonpath="{.data.mysql-root-password}" | base64 -d) && \
+  kubectl exec -i deployment/wiki-mysql -n wetfish-staging -- \
+  mysql -uroot -p"${ROOT_PASS}" wikidb < /opt/web-services-k8s/services/wiki/src/wwwroot/src/schema.sql'
 ```
 
-Expected output - all pods Running, all ingresses with hosts assigned:
-```
-wiki-web-xxx        2/2   Running
-wiki-mysql-xxx      1/1   Running
-home-web-xxx        1/1   Running
-glitch-web-xxx      2/2   Running
-click-web-xxx       2/2   Running
-click-mysql-xxx     1/1   Running
-danger-web-xxx      2/2   Running
-danger-mysql-xxx    1/1   Running
-```
-
-### 5. Load DB Schemas (First Deploy Only)
-
-On first deploy, database schemas must be loaded manually. Replace passwords with the ones generated in step 2.
+### 5. Verify Deployment
 
 ```bash
-# Wiki
-kubectl exec -i deployment/wiki-mysql -n wetfish-staging -- \
-  mysql -uroot -p<WIKI_ROOT_PASSWORD> wikidb < services/wiki/src/wwwroot/src/schema.sql
+# Check pods
+ssh stage "kubectl get pods -n wetfish-staging"
 
-# Click
-kubectl exec -i deployment/click-mysql -n wetfish-staging -- \
-  mysql -uroot -p<CLICK_ROOT_PASSWORD> clickdb < services/click/src/schema.sql
+# Check ingress
+ssh stage "kubectl get ingress -n wetfish-staging"
 
-# Danger
-kubectl exec -i deployment/danger-mysql -n wetfish-staging -- \
-  mysql -uroot -p<DANGER_ROOT_PASSWORD> dangerdb < services/danger/src/schema.sql
+# Test via HTTPS (through Cloudflare)
+curl -s -o /dev/null -w "staging-wiki.wetfish.net -> HTTP %{http_code}\n" \
+  https://staging-wiki.wetfish.net
+
+# Test locally on the server (bypassing Cloudflare)
+ssh stage 'curl -s -o /dev/null -w "%{http_code}" \
+  --resolve "staging-wiki.wetfish.net:80:127.0.0.1" \
+  http://staging-wiki.wetfish.net/'
 ```
 
-### 6. Smoke Test
+### 6. Updating Deployments
+
+After pushing changes to `main` and CI builds new images:
 
 ```bash
-# Test each service endpoint
-for svc in wiki glitch click danger; do
-  curl -s -o /dev/null -w "staging-$svc.wetfish.net -> HTTP %{http_code}\n" \
-    https://staging-$svc.wetfish.net
-done
-# Home is at staging.wetfish.net (no prefix)
-curl -s -o /dev/null -w "staging.wetfish.net -> HTTP %{http_code}\n" \
-  https://staging.wetfish.net
+ssh stage "cd /opt/web-services-k8s && git pull && ./scripts/deploy.sh --env staging wiki"
+# k3s will pull the latest image with the staging-* tag
+```
+
+To force a re-pull if the tag hasn't changed:
+```bash
+ssh stage "kubectl rollout restart deployment/wiki-web -n wetfish-staging"
 ```
 
 ---
@@ -196,10 +218,7 @@ git merge main
 git push origin release
 ```
 
-Wait for GitHub Actions to complete. Verify:
-```bash
-gh run list --branch release --limit 5
-```
+Wait for GitHub Actions to complete.
 
 | Service | Image Tags |
 |---------|-----------|
@@ -212,7 +231,6 @@ gh run list --branch release --limit 5
 ### 2. Generate Secrets
 
 ```bash
-# Generate with random passwords (required for production)
 ./scripts/generate-secrets.sh --env prod --random
 ```
 
@@ -271,9 +289,6 @@ kubectl exec -i deployment/danger-mysql -n wetfish-prod -- \
 # Check all pods
 kubectl get pods -n wetfish-prod
 
-# Check TLS certificates are issued
-kubectl get certificates -n wetfish-prod
-
 # Test endpoints
 for svc in wiki glitch click danger; do
   curl -s -o /dev/null -w "$svc.wetfish.net -> HTTP %{http_code}\n" \
@@ -306,10 +321,6 @@ kubectl rollout status deployment/wiki-web -n wetfish-prod
 If you need to deploy a specific previous image version:
 
 ```bash
-# List available image tags
-gh api /orgs/cybaxx/packages/container/web-services-k8s%2Fwiki/versions \
-  --jq '.[].metadata.container.tags[]' | head -20
-
 # Set a specific image
 kubectl set image deployment/wiki-web \
   nginx=ghcr.io/cybaxx/web-services-k8s/wiki:prod-nginx \
@@ -338,14 +349,6 @@ Nuclear option - remove everything and start fresh:
 # Backup wiki database
 kubectl exec deployment/wiki-mysql -n wetfish-prod -- \
   mysqldump -uroot -p<PASSWORD> --single-transaction wikidb > wiki-backup-$(date +%Y%m%d).sql
-
-# Backup click database
-kubectl exec deployment/click-mysql -n wetfish-prod -- \
-  mysqldump -uroot -p<PASSWORD> --single-transaction clickdb > click-backup-$(date +%Y%m%d).sql
-
-# Backup danger database
-kubectl exec deployment/danger-mysql -n wetfish-prod -- \
-  mysqldump -uroot -p<PASSWORD> --single-transaction dangerdb > danger-backup-$(date +%Y%m%d).sql
 ```
 
 ### Restore
@@ -377,9 +380,6 @@ Preview what will be deployed without applying:
 # Preview staging manifests
 kubectl kustomize services/wiki/k8s/overlays/staging/
 
-# Preview prod manifests
-kubectl kustomize services/wiki/k8s/overlays/prod/
-
 # Diff against what's currently deployed
 kubectl diff -k services/wiki/k8s/overlays/staging/
 ```
@@ -392,28 +392,32 @@ kubectl diff -k services/wiki/k8s/overlays/staging/
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| `ImagePullBackOff` | GHCR image not found | Check GitHub Actions completed; verify image tag exists |
-| `CreateContainerConfigError` | Missing secret | Run `generate-secrets.sh --env <env>` and redeploy |
+| `ImagePullBackOff` | GHCR image not found | Check GitHub Actions completed; verify with `crictl pull` on server |
+| `CreateContainerConfigError` | Missing secret | Generate secret.yaml and add to kustomization.yaml |
 | Wiki returns 500 | DB schema not loaded | Load schema per instructions above |
-| TLS certificate not issued | cert-manager misconfigured | Check `kubectl describe certificate -n <ns>` and ClusterIssuer |
+| ACME cert not issued | Cloudflare proxy blocking challenge | Verify Cloudflare forwards to correct origin IP; check Traefik logs |
+| ServiceMonitor warnings | No monitoring CRDs on staging | Harmless — ignore |
 | MySQL `CrashLoopBackOff` | Corrupted PVC data | Delete PVC, redeploy, reload schema |
+| `generate-secrets.sh` exits 141 | SIGPIPE from `tr \| head` on Linux | Fixed in latest; or generate secrets manually |
 
 ### Useful Debug Commands
 
 ```bash
 # Pod logs
-kubectl logs deployment/wiki-web -n wetfish-staging -c nginx -f
-kubectl logs deployment/wiki-web -n wetfish-staging -c php-fpm -f
-kubectl logs deployment/wiki-mysql -n wetfish-staging -f
+ssh stage "kubectl logs deployment/wiki-web -n wetfish-staging -c nginx -f"
+ssh stage "kubectl logs deployment/wiki-web -n wetfish-staging -c php-fpm -f"
+ssh stage "kubectl logs deployment/wiki-mysql -n wetfish-staging -f"
+ssh stage "kubectl logs deployment/traefik -n wetfish-system --tail=20"
 
 # Shell into a container
-kubectl exec -it deployment/wiki-web -n wetfish-staging -c php-fpm -- bash
+ssh stage "kubectl exec -it deployment/wiki-web -n wetfish-staging -c php-fpm -- bash"
 
 # Check events
-kubectl get events -n wetfish-staging --sort-by=.metadata.creationTimestamp | tail -20
+ssh stage "kubectl get events -n wetfish-staging --sort-by=.metadata.creationTimestamp | tail -20"
 
-# Check resource usage
-kubectl top pods -n wetfish-staging
+# Check memory usage (important on 1GB server)
+ssh stage "free -h"
+ssh stage "kubectl top pods -n wetfish-staging"
 ```
 
 See `docs/troubleshooting.md` for more detailed troubleshooting guidance.
