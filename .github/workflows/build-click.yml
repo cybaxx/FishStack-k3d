@@ -8,6 +8,10 @@ on:
       - '.github/workflows/build-service.yml'
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   nginx:
     uses: ./.github/workflows/build-service.yml

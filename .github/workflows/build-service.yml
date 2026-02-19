@@ -20,10 +20,6 @@ on:
         required: true
         type: string
 
-permissions:
-  contents: read
-  packages: write
-
 env:
   REGISTRY: ghcr.io
 
