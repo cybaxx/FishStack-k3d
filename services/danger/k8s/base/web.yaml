@@ -1,0 +1,125 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: danger-web
+  labels:
+    component: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: danger
+      component: web
+  template:
+    metadata:
+      labels:
+        app: danger
+        component: web
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      # Nginx container
+      - name: nginx
+        image: DANGER_NGINX_IMAGE:latest
+        ports:
+        - containerPort: 80
+          name: http
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "25m"
+          limits:
+            memory: "64Mi"
+            cpu: "100m"
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: nginx.conf
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+      # PHP-FPM container (sidecar)
+      - name: php-fpm
+        image: DANGER_PHP_IMAGE:latest
+        ports:
+        - containerPort: 9000
+          name: php-fpm
+        env:
+        - name: DB_HOSTNAME
+          value: "danger-mysql"
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: danger-mysql-secret
+              key: mysql-user
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: danger-mysql-secret
+              key: mysql-password
+        - name: DB_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: danger-mysql-secret
+              key: mysql-database
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        volumeMounts:
+        - name: php-config
+          mountPath: /usr/local/etc/php/php.ini
+          subPath: php.ini
+        - name: php-config
+          mountPath: /usr/local/etc/php-fpm.d/www.conf
+          subPath: php-fpm-pool.conf
+        livenessProbe:
+          tcpSocket:
+            port: 9000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: 9000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: danger-nginx-config
+      - name: php-config
+        configMap:
+          name: danger-php-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: danger-web
+  labels:
+    component: web
+spec:
+  selector:
+    app: danger
+    component: web
+  ports:
+  - port: 80
+    targetPort: 80
+    name: http
+  type: ClusterIP

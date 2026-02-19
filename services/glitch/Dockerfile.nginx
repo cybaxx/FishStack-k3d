@@ -1,6 +1,6 @@
 FROM docker.io/node:14 AS npm
 
-COPY ./public_html /public_html
+COPY ./src/public_html /public_html
 
 RUN set -exu \
   && cd /public_html \

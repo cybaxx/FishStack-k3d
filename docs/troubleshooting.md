@@ -247,14 +247,12 @@ kubectl get svc wiki-web -n wetfish-dev -o yaml
 
 **2. Check Prometheus Configuration**
 ```bash
-# Check Prometheus reload
-kubectl exec deployment/prometheus -n wetfish-monitoring -- wget -qO- http://localhost:9090/-/reload
-
 # Check Prometheus logs
-kubectl logs deployment/prometheus -n wetfish-monitoring | tail -50
+kubectl logs prometheus-prometheus-kube-prometheus-prometheus-0 -n wetfish-monitoring --tail=50
 
-# Check target endpoints
-curl http://localhost:9090/api/v1/targets
+# Port-forward and check targets
+kubectl port-forward svc/prometheus-kube-prometheus-prometheus 9090:9090 -n wetfish-monitoring
+# Visit http://localhost:9090/targets
 ```
 
 **3. Verify Metrics Endpoint**
@@ -277,26 +275,20 @@ kubectl exec deployment/wiki-web -n wetfish-dev -- curl localhost:80/metrics
 
 **1. Check Datasource Configuration**
 ```bash
-# Test Prometheus connection
-curl http://localhost:3000/api/datasources/proxy/1/api/v1/query?query=up
+# Port-forward Grafana
+kubectl port-forward svc/prometheus-grafana 3000:80 -n wetfish-monitoring
 
-# Check datasource configuration
-curl http://localhost:3000/api/datasources
+# Check datasources (admin/admin)
+curl -u admin:admin http://localhost:3000/api/datasources
 
 # Test from Grafana pod
-kubectl exec deployment/grafana -n wetfish-monitoring -- curl http://prometheus:9090/api/v1/query?query=up
+kubectl exec deployment/prometheus-grafana -n wetfish-monitoring -- \
+  curl -s http://prometheus-kube-prometheus-prometheus:9090/api/v1/query?query=up
 ```
 
-**2. Verify Dashboard Import**
+**2. Restart Grafana**
 ```bash
-# Check dashboard database
-kubectl exec deployment/grafana -n wetfish-monitoring -- sqlite3 /var/lib/grafana/grafana.db ".dashboards"
-
-# Re-import dashboards
-kubectl apply -f monitoring/grafana/dashboards/
-
-# Restart Grafana
-kubectl rollout restart deployment/grafana -n wetfish-monitoring
+kubectl rollout restart deployment/prometheus-grafana -n wetfish-monitoring
 ```
 
 ---
@@ -379,6 +371,65 @@ kubectl logs wiki-mysql-pod | grep ERROR
 
 # Verify import
 kubectl exec wiki-mysql-pod -- mysql -u root -p database_name -e "SELECT COUNT(*) FROM page;"
+```
+
+---
+
+## 🔒 Security Context Issues
+
+### **CreateContainerConfigError: runAsNonRoot**
+
+#### **Symptoms**
+```
+Error: container has runAsNonRoot and image will run as root
+Error: container has runAsNonRoot and image has non-numeric user (root)
+```
+
+#### **Root Cause**
+Pod-level `securityContext.runAsNonRoot: true` or container-level `capabilities: drop: ["ALL"]` conflicts with images that run as root. Affected images:
+- **nginx** (1.25-alpine) - runs as root
+- **php-fpm** (php:5.6-fpm-alpine and Debian bookworm) - runs as root
+- **MariaDB** (10.10) - needs root for `chown` on `/var/lib/mysql` during init
+
+#### **Solutions**
+
+**For web pods (nginx/php-fpm):** Remove `runAsNonRoot: true` from pod securityContext. Keep only `seccompProfile: RuntimeDefault`.
+
+**For MariaDB:** Remove restrictive container securityContext (`capabilities: drop: ["ALL"]`). MariaDB needs CHOWN, DAC_OVERRIDE, FOWNER, SETUID, SETGID capabilities for data directory initialization.
+
+**For Traefik:** Use the built-in non-root user: `runAsUser: 65532`, `runAsGroup: 65532`, and add `NET_BIND_SERVICE` capability.
+
+### **MariaDB CrashLoopBackOff: chown Operation not permitted**
+
+#### **Symptoms**
+```
+chown: changing ownership of '/var/lib/mysql/': Operation not permitted
+```
+
+#### **Root Cause**
+Container securityContext with `capabilities: drop: ["ALL"]` prevents MariaDB from running `chown` during initialization. Even adding `SETUID`/`SETGID` is insufficient - MariaDB also needs `CHOWN`, `DAC_OVERRIDE`, and `FOWNER`.
+
+#### **Solution**
+Remove the restrictive container securityContext from MySQL deployments entirely. MariaDB requires root privileges for data directory initialization.
+
+### **Wiki Nginx Restart Loop (Liveness Probe Failure)**
+
+#### **Symptoms**
+- nginx container restarts every ~30 seconds
+- Exit code 0 (graceful shutdown from SIGTERM)
+- `httpGet` liveness probe on `/` returns 500
+
+#### **Root Cause**
+The wiki app returns HTTP 500 when the database schema hasn't been loaded yet. The `httpGet` liveness probe interprets this as unhealthy and kills the container.
+
+#### **Solution**
+Use `tcpSocket` probes instead of `httpGet` for services where the application may return non-200 responses during initialization:
+```yaml
+livenessProbe:
+  tcpSocket:
+    port: 80
+  initialDelaySeconds: 10
+  periodSeconds: 10
 ```
 
 ---

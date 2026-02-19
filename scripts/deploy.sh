@@ -1,12 +1,13 @@
 #!/bin/bash
 # Deploy services to wetfish Kubernetes cluster
+# Supports multi-environment deployment via Kustomize overlays
 
 set -euo pipefail
 
 # Auto-detect project directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-DEFAULT_NAMESPACE="wetfish-dev"
+DEFAULT_ENV="dev"
 
 # Colors for output
 RED='\033[0;31m'
@@ -32,80 +33,73 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+# Map environment to namespace
+env_to_namespace() {
+    case "$1" in
+        dev)        echo "wetfish-dev" ;;
+        staging)    echo "wetfish-staging" ;;
+        prod)       echo "wetfish-prod" ;;
+        *)          echo "" ;;
+    esac
+}
+
 # Show usage
 show_usage() {
-    echo "Usage: $0 [namespace] [service] [action]"
+    echo "Usage: $0 [--env dev|staging|prod] <service> [delete]"
+    echo
+    echo "Options:"
+    echo "  --env ENV    Target environment (default: dev)"
     echo
     echo "Examples:"
-    echo "  $0 wetfish-dev wiki     # Deploy wiki service to dev"
-    echo "  $0 wetfish-dev wiki delete   # Delete wiki service from dev"
-    echo "  $0 wetfish-monitoring monitoring  # Deploy monitoring stack"
+    echo "  $0 wiki                      # Deploy wiki to dev"
+    echo "  $0 --env dev wiki            # Deploy wiki to dev"
+    echo "  $0 --env staging wiki        # Deploy wiki to staging"
+    echo "  $0 --env prod wiki           # Deploy wiki to prod"
+    echo "  $0 --env dev wiki delete     # Delete wiki from dev"
+    echo "  $0 monitoring                # Deploy monitoring stack"
+    echo "  $0 traefik                   # Deploy Traefik"
+    echo
+    echo "Environments:"
+    echo "  dev      - Local k3d cluster, wetfish-dev namespace"
+    echo "  staging  - Staging, wetfish-staging namespace"
+    echo "  prod     - Production, wetfish-prod namespace"
     echo
     echo "Available services:"
-    echo "  wiki           - MediaWiki application"
-    echo "  monitoring      - Full monitoring stack"
-    echo "  traefik        - Ingress controller"
+    echo "  wiki, home, glitch, click, danger"
+    echo "  monitoring  - Full monitoring stack (Helm)"
+    echo "  traefik     - Ingress controller (Helm)"
+    echo "  cert-manager - TLS certificate manager (Helm)"
     echo
-    echo "Available namespaces:"
-    echo "  wetfish-dev       - Development environment"
-    echo "  wetfish-monitoring - Monitoring stack"
-    echo "  wetfish-system    - Infrastructure"
+    echo "Legacy usage (backward compat):"
+    echo "  $0 wetfish-dev wiki          # Same as --env dev wiki"
 }
 
-# Validate namespace and service
-validate_inputs() {
-    local namespace=${1:-$DEFAULT_NAMESPACE}
-    local service=${2:-}
-    local action=${3:-deploy}
-    
-    if [[ -z "$service" ]]; then
-        log_error "Service name is required"
-        show_usage
+# Deploy service via Kustomize overlay
+deploy_service() {
+    local env=$1
+    local service=$2
+    local namespace
+    namespace=$(env_to_namespace "$env")
+
+    log_info "Deploying $service to $env ($namespace)..."
+
+    local overlay_dir="${PROJECT_DIR}/services/${service}/k8s/overlays/${env}"
+    if [[ ! -d "$overlay_dir" ]]; then
+        log_error "Overlay not found at $overlay_dir"
         exit 1
     fi
-    
+
     # Check if namespace exists
     if ! kubectl get namespace "$namespace" >/dev/null 2>&1; then
-        log_error "Namespace '$namespace' does not exist"
-        exit 1
-    fi
-    
-    # Check if service directory exists
-    local service_dir="${PROJECT_DIR}/services/${service}"
-    if [[ ! -d "$service_dir" ]]; then
-        log_error "Service directory '$service_dir' does not exist"
-        exit 1
-    fi
-    
-    echo "Namespace: $namespace"
-    echo "Service: $service"
-    echo "Action: $action"
-}
-
-# Deploy service
-deploy_service() {
-    local namespace=$1
-    local service=$2
-    
-    log_info "Deploying $service to namespace $namespace..."
-    
-    local k8s_dir="${PROJECT_DIR}/services/${service}/k8s"
-    if [[ ! -d "$k8s_dir" ]]; then
-        log_error "Kubernetes manifests not found at $k8s_dir"
+        log_error "Namespace '$namespace' does not exist. Run: kubectl apply -f infrastructure/namespaces.yaml"
         exit 1
     fi
 
-    # Apply all YAML files in order
-    for manifest in "$k8s_dir"/*.yaml; do
-        if [[ -f "$manifest" ]]; then
-            log_info "Applying $(basename "$manifest")"
-            if ! kubectl apply -f "$manifest" -n "$namespace" 2>/dev/null; then
-                log_warning "Skipped $(basename "$manifest") (may require CRDs not yet installed)"
-            fi
-        fi
-    done
+    if ! kubectl apply -k "$overlay_dir"; then
+        log_warning "Some resources failed to apply (likely missing CRDs like ServiceMonitor)"
+    fi
 
-    log_success "Service $service deployed to $namespace"
+    log_success "Service $service deployed to $env ($namespace)"
 
     # Show deployment status
     show_deployment_status "$namespace" "$service"
@@ -113,51 +107,50 @@ deploy_service() {
 
 # Delete service
 delete_service() {
-    local namespace=$1
+    local env=$1
     local service=$2
-    
-    log_warning "Deleting $service from namespace $namespace..."
-    
-    local k8s_dir="${PROJECT_DIR}/services/${service}/k8s"
-    if [[ -d "$k8s_dir" ]]; then
-        # Delete all YAML files
-        for manifest in "$k8s_dir"/*.yaml; do
-            if [[ -f "$manifest" ]]; then
-                log_info "Deleting $(basename "$manifest")"
-                kubectl delete -f "$manifest" -n "$namespace" --ignore-not-found=true
-            fi
-        done
+    local namespace
+    namespace=$(env_to_namespace "$env")
+
+    log_warning "Deleting $service from $env ($namespace)..."
+
+    local overlay_dir="${PROJECT_DIR}/services/${service}/k8s/overlays/${env}"
+    if [[ -d "$overlay_dir" ]]; then
+        kubectl delete -k "$overlay_dir" --ignore-not-found=true
     fi
-    
-    log_success "Service $service deleted from $namespace"
+
+    log_success "Service $service deleted from $env ($namespace)"
 }
 
 # Show deployment status
 show_deployment_status() {
     local namespace=$1
     local service=$2
-    
+
     echo
     log_info "Checking deployment status..."
-    
+
     # Wait for deployment to complete (with timeout)
-    if kubectl get deployment "$service" -n "$namespace" >/dev/null 2>&1; then
+    if kubectl get deployment "${service}-web" -n "$namespace" >/dev/null 2>&1; then
+        kubectl rollout status deployment/"${service}-web" -n "$namespace" --timeout=300s
+        log_success "Deployment completed successfully"
+    elif kubectl get deployment "$service" -n "$namespace" >/dev/null 2>&1; then
         kubectl rollout status deployment/"$service" -n "$namespace" --timeout=300s
         log_success "Deployment completed successfully"
     else
         log_warning "No deployment found for $service"
     fi
-    
+
     # Show pod status
     echo
     log_info "Pod status:"
     kubectl get pods -n "$namespace" -l app="$service" --show-labels
-    
+
     # Show service status
     echo
     log_info "Service status:"
     kubectl get services -n "$namespace" -l app="$service"
-    
+
     # Show ingress status
     echo
     log_info "Ingress status:"
@@ -218,6 +211,20 @@ deploy_monitoring() {
             --wait --timeout 10m
     fi
 
+    # Deploy Promtail (log collector)
+    log_info "Installing Promtail..."
+    if [[ -f "${PROJECT_DIR}/monitoring/values/promtail-values.yaml" ]]; then
+        helm upgrade --install promtail grafana/promtail \
+            --namespace wetfish-monitoring \
+            --values "${PROJECT_DIR}/monitoring/values/promtail-values.yaml" \
+            --wait --timeout 5m
+    else
+        log_warning "Promtail values file not found, using defaults"
+        helm upgrade --install promtail grafana/promtail \
+            --namespace wetfish-monitoring \
+            --wait --timeout 5m
+    fi
+
     log_success "Monitoring stack deployed"
 
     # Show access info
@@ -232,14 +239,33 @@ deploy_monitoring() {
     log_info "Grafana default credentials: admin / admin"
 }
 
+# Deploy cert-manager
+deploy_cert_manager() {
+    log_info "Deploying cert-manager..."
+
+    helm repo add jetstack https://charts.jetstack.io
+    helm repo update
+
+    helm upgrade --install cert-manager jetstack/cert-manager \
+        --namespace cert-manager \
+        --create-namespace \
+        --set crds.enabled=true \
+        --wait --timeout 5m
+
+    log_info "Applying ClusterIssuer..."
+    kubectl apply -f "${PROJECT_DIR}/infrastructure/cert-manager/cluster-issuer.yaml"
+
+    log_success "cert-manager deployed with self-signed ClusterIssuer"
+}
+
 # Deploy Traefik
 deploy_traefik() {
     log_info "Deploying Traefik ingress controller..."
-    
+
     # Add Traefik Helm repository
     helm repo add traefik https://helm.traefik.io/traefik
     helm repo update
-    
+
     # Install Traefik
     helm install traefik traefik/traefik \
         --namespace wetfish-system \
@@ -251,47 +277,101 @@ deploy_traefik() {
         --set service.nodePorts.https=30443 \
         --set providers.kubernetesCRD.enabled=true \
         --wait
-    
+
     log_success "Traefik ingress controller deployed"
 }
 
 # Show access information
 show_access_info() {
-    local namespace=$1
+    local env=$1
     local service=$2
-    
+    local namespace
+    namespace=$(env_to_namespace "$env")
+
     echo
     log_info "Access Information:"
-    
+
     # Get ingress URLs
-    local ingress_host=$(kubectl get ingress "$service-ingress" -n "$namespace" -o jsonpath='{.spec.rules[0].host}' 2>/dev/null || echo "")
+    local ingress_host
+    ingress_host=$(kubectl get ingress "$service-ingress" -n "$namespace" -o jsonpath='{.spec.rules[0].host}' 2>/dev/null || echo "")
     if [[ -n "$ingress_host" ]]; then
-        echo "🌐 Service URL: http://$ingress_host"
-        echo "   Add to /etc/hosts: 127.0.0.1 $ingress_host"
+        echo "  Service URL: http://$ingress_host"
+        if [[ "$env" == "dev" ]]; then
+            echo "  Add to /etc/hosts: 127.0.0.1 $ingress_host"
+        fi
     fi
-    
+
     # Show port-forwarding info
-    echo "🔧 Port forwarding:"
-    echo "   kubectl port-forward svc/$service 8080:80 -n $namespace"
-    
+    echo "  Port forwarding:"
+    echo "    kubectl port-forward svc/${service}-web 8080:80 -n $namespace"
+
     # Show logs command
-    echo "📋 View logs:"
-    echo "   kubectl logs deployment/$service -n $namespace -f"
+    echo "  View logs:"
+    echo "    kubectl logs deployment/${service}-web -n $namespace -f"
 }
 
 # Main function
 main() {
-    local namespace=${1:-$DEFAULT_NAMESPACE}
-    local service=${2:-}
-    local action=${3:-deploy}
-    
+    local env="$DEFAULT_ENV"
+    local service=""
+    local action="deploy"
+
+    # Parse arguments
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --env)
+                env="$2"
+                shift 2
+                ;;
+            -h|--help|help)
+                show_usage
+                exit 0
+                ;;
+            *)
+                if [[ -z "$service" ]]; then
+                    # Backward compat: if first arg looks like a namespace, map to env
+                    case "$1" in
+                        wetfish-dev)
+                            env="dev"
+                            ;;
+                        wetfish-staging)
+                            env="staging"
+                            ;;
+                        wetfish-prod)
+                            env="prod"
+                            ;;
+                        wetfish-monitoring|wetfish-system)
+                            # Legacy usage: $0 wetfish-monitoring monitoring
+                            # Just skip the namespace arg, next arg is the service
+                            shift
+                            continue
+                            ;;
+                        *)
+                            service="$1"
+                            ;;
+                    esac
+                elif [[ "$service" == "" ]]; then
+                    service="$1"
+                else
+                    action="$1"
+                fi
+                shift
+                ;;
+        esac
+    done
+
+    # Validate environment
+    if [[ -z "$(env_to_namespace "$env")" ]]; then
+        log_error "Invalid environment: $env (must be dev, staging, or prod)"
+        exit 1
+    fi
+
     case "$service" in
-        "help"|"-h"|"--help")
-            show_usage
-            exit 0
-            ;;
         "monitoring")
             deploy_monitoring
+            ;;
+        "cert-manager")
+            deploy_cert_manager
             ;;
         "traefik")
             deploy_traefik
@@ -302,15 +382,20 @@ main() {
             exit 1
             ;;
         *)
-            validate_inputs "$namespace" "$service" "$action"
-            
+            # Validate service directory exists
+            local service_dir="${PROJECT_DIR}/services/${service}"
+            if [[ ! -d "$service_dir" ]]; then
+                log_error "Service directory '$service_dir' does not exist"
+                exit 1
+            fi
+
             case "$action" in
                 "delete")
-                    delete_service "$namespace" "$service"
+                    delete_service "$env" "$service"
                     ;;
                 *)
-                    deploy_service "$namespace" "$service"
-                    show_access_info "$namespace" "$service"
+                    deploy_service "$env" "$service"
+                    show_access_info "$env" "$service"
                     ;;
             esac
             ;;

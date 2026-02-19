@@ -191,12 +191,23 @@ show_access_info() {
     echo
 }
 
+# Initialize git submodules (service source code)
+init_submodules() {
+    log_info "Initializing git submodules..."
+
+    cd "$PROJECT_DIR"
+    git submodule update --init --recursive
+
+    log_success "Git submodules initialized"
+}
+
 # Main function
 main() {
     log_info "Setting up wetfish development Kubernetes cluster"
     echo "=================================================="
     
     check_prerequisites
+    init_submodules
     cleanup_cluster
     create_cluster
     setup_namespaces

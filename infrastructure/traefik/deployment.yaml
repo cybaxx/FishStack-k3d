@@ -18,11 +18,22 @@ spec:
         component: ingress-controller
     spec:
       serviceAccountName: traefik
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: traefik
         image: traefik:v2.11
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+            add: ["NET_BIND_SERVICE"]
         args:
-          - "--api.insecure=true"
+          - "--api.dashboard=true"
           - "--providers.kubernetesingress"
           - "--entrypoints.web.address=:80"
           - "--entrypoints.websecure.address=:443"

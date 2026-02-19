@@ -116,26 +116,13 @@ All traffic between clients and the cluster, and between Traefik and backend ser
 Both containers in the wiki pod run as UID 0 (root). Container breakout exploits (e.g., CVE-2024-21626 runc, CVE-2022-0185 kernel) become full node compromises when the container runs as root.
 
 **Remediation:**
-1. Add `securityContext` to pod spec:
-   ```yaml
-   securityContext:
-     runAsNonRoot: true
-     runAsUser: 33        # www-data
-     runAsGroup: 33
-     fsGroup: 33
-     seccompProfile:
-       type: RuntimeDefault
-   ```
-2. Add per-container security context:
-   ```yaml
-   securityContext:
-     allowPrivilegeEscalation: false
-     readOnlyRootFilesystem: true
-     capabilities:
-       drop: ["ALL"]
-   ```
-3. Update Dockerfiles to use non-root USER as final instruction
-4. Add `tmpfs` mounts for writable directories (`/tmp`, `/var/run`, `/var/cache/nginx`)
+
+> **Note (2026-02-18):** The `runAsNonRoot: true` and `capabilities: drop: ["ALL"]` recommendations were applied but caused `CreateContainerConfigError` and `CrashLoopBackOff` across all services. The standard nginx, php-fpm, and MariaDB images all require root. These restrictions have been rolled back to `seccompProfile: RuntimeDefault` only. Proper non-root support requires custom image builds with non-root USER instructions, which is deferred to the production hardening phase.
+
+1. **Current state:** Pod-level `seccompProfile: RuntimeDefault` is applied. Container-level privilege restrictions are deferred.
+2. **Future (prod hardening):** Rebuild images with non-root USER, add `readOnlyRootFilesystem`, `tmpfs` mounts for writable dirs, and `capabilities: drop: ["ALL"]`
+3. **Exception:** Traefik v2.11 supports non-root natively (`runAsUser: 65532`) and has full restrictions applied
+4. **Exception:** MariaDB will always need elevated capabilities (CHOWN, DAC_OVERRIDE, FOWNER, SETUID, SETGID) for data directory initialization
 
 ---
 
@@ -352,17 +339,15 @@ No PDBs defined. Node drains during maintenance will terminate all replicas simu
 
 ---
 
-### MED-03: PVC Storage Class Assumptions
+### MED-03: PVC Storage Class Assumptions -- RESOLVED
 
 **Affected:** `services/wiki/k8s/03-mysql.yaml`, `05-web.yaml`
 
-**Description:**
-`storageClassName: local-path` is hardcoded. This is k3d/k3s-specific and will fail on other clusters (EKS, GKE, AKS). No backup/snapshot strategy exists for persistent data.
+**Status:** RESOLVED. Kustomize overlays now parameterize storageClassName per environment. Base manifests have no storageClassName; dev overlay patches `local-path`, staging/prod use cluster defaults.
 
-**Remediation:**
-1. Use Helm values or Kustomize overlays to parameterize storage class per environment
-2. Implement VolumeSnapshot-based backup for MySQL data
-3. Document RTO/RPO targets for data recovery
+**Remaining:**
+- [ ] Implement VolumeSnapshot-based backup for MySQL data
+- [ ] Document RTO/RPO targets for data recovery
 
 ---
 
@@ -434,17 +419,21 @@ Docker Compose files may reference stale service names or configurations that ha
 
 ---
 
-### MED-09: Monitoring Stack Not Deployed
+### MED-09: Monitoring Stack Not Deployed -- RESOLVED
 
 **Affected:** `monitoring/values/*.yaml`
 
-**Description:**
-Helm values for Prometheus, Grafana, Loki, and Tempo are defined but the monitoring stack is not deployed. No observability into application errors, resource usage, or security events.
+**Status:** RESOLVED. Full monitoring stack deployed to `wetfish-monitoring` namespace:
+- kube-prometheus-stack (Prometheus, Grafana, Alertmanager, node-exporter, kube-state-metrics)
+- Loki (log aggregation, SingleBinary mode)
+- Tempo (distributed tracing)
+- Promtail (DaemonSet log collector shipping to Loki)
+- Grafana has 4 pre-configured datasources (Prometheus, Alertmanager, Loki, Tempo)
+- Wiki ServiceMonitors created for Prometheus target discovery
 
-**Remediation:**
-1. Deploy monitoring stack with Helm
-2. Create alerts for: pod restarts, high error rates, resource pressure, failed login attempts
-3. Ship nginx access/error logs to Loki for security event correlation
+**Remaining:**
+- [ ] Create custom alert rules for: pod restarts, high error rates, resource pressure
+- [ ] Add ServiceMonitors for click, danger, glitch services
 
 ---
 
@@ -525,7 +514,7 @@ location ~ /\.(git|env|htaccess|htpasswd) {
 | A06 | Vulnerable/Outdated Components | WARN | CRIT-05, MED-01 |
 | A07 | Identification & Auth Failures | FAIL | CRIT-02, HIGH-04 |
 | A08 | Software & Data Integrity Failures | WARN | HIGH-06, MED-01 |
-| A09 | Security Logging & Monitoring | FAIL | MED-09 |
+| A09 | Security Logging & Monitoring | PARTIAL | MED-09 (stack deployed, custom alerts pending) |
 | A10 | Server-Side Request Forgery | PASS | No SSRF vectors identified |
 
 ---
@@ -550,9 +539,9 @@ location ~ /\.(git|env|htaccess|htpasswd) {
 
 ### Phase 3: Operational Maturity (Week 7-12)
 - [ ] HIGH-03: Deploy ResourceQuota and LimitRange
-- [ ] MED-03: Parameterize storage class per environment
+- [x] MED-03: ~~Parameterize storage class per environment~~ (done via Kustomize overlays)
 - [ ] MED-06: Add startup probes
-- [ ] MED-09: Deploy monitoring stack (Prometheus/Grafana/Loki)
+- [x] MED-09: ~~Deploy monitoring stack~~ (Prometheus, Grafana, Loki, Tempo, Promtail deployed)
 - [ ] MED-10: Implement automated backup strategy
 - [ ] LOW-*: Address remaining low-severity findings
 

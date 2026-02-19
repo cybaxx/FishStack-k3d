@@ -1,0 +1,20 @@
+[submodule "services/wiki/src"]
+	path = services/wiki/src
+	url = https://github.com/wetfish/wiki.git
+	branch = release
+[submodule "services/home/src"]
+	path = services/home/src
+	url = https://github.com/wetfish/wetfish.net
+	branch = release
+[submodule "services/glitch/src"]
+	path = services/glitch/src
+	url = https://github.com/wetfish/glitch.git
+	branch = release
+[submodule "services/click/src"]
+	path = services/click/src
+	url = https://github.com/wetfish/click.git
+	branch = release
+[submodule "services/danger/src"]
+	path = services/danger/src
+	url = https://github.com/wetfish/danger.git
+	branch = release

@@ -1,6 +1,6 @@
 FROM docker.io/nginx:1.25-alpine
 
-COPY ./wwwroot /var/www
+COPY ./src/wwwroot /var/www
 
 RUN set -exu \
   && chown -R nginx:nginx /var/www

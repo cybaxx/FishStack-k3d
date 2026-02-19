@@ -2,7 +2,7 @@ FROM docker.io/php:5.6-fpm-alpine
 
 RUN docker-php-ext-install mysqli mysql
 
-COPY ./wwwroot /var/www
+COPY ./src/wwwroot /var/www
 
 RUN set -exu \
   && chown -R www-data:www-data /var/www \

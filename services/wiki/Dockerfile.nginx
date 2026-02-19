@@ -26,7 +26,7 @@ RUN set -exu \
       builder
 
 # copy in sources
-COPY ./wwwroot /var/www
+COPY ./src/wwwroot /var/www
 
 # make sure our user owns the wwwroot
 RUN set -exu \
