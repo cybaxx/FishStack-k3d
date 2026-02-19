@@ -1,0 +1,16 @@
+creation_rules:
+  # Staging secrets - encrypted with staging age key
+  - path_regex: clusters/staging/.*\.yaml
+    encrypted_regex: "^(data|stringData)$"
+    age: "REPLACE_WITH_STAGING_AGE_PUBLIC_KEY"
+  - path_regex: services/.*/k8s/overlays/staging/secret\.yaml
+    encrypted_regex: "^(data|stringData)$"
+    age: "REPLACE_WITH_STAGING_AGE_PUBLIC_KEY"
+
+  # Production secrets - encrypted with prod age key
+  - path_regex: clusters/prod/.*\.yaml
+    encrypted_regex: "^(data|stringData)$"
+    age: "REPLACE_WITH_PROD_AGE_PUBLIC_KEY"
+  - path_regex: services/.*/k8s/overlays/prod/secret\.yaml
+    encrypted_regex: "^(data|stringData)$"
+    age: "REPLACE_WITH_PROD_AGE_PUBLIC_KEY"

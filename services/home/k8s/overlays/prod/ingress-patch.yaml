@@ -7,10 +7,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - home.wetfish.net
+    - wetfish.net
     secretName: home-tls
   rules:
-  - host: home.wetfish.net
+  - host: wetfish.net
     http:
       paths:
       - path: /

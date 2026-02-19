@@ -1,0 +1,18 @@
+name: Build Home
+on:
+  push:
+    branches: [main, release]
+    paths:
+      - 'services/home/**'
+      - '.github/workflows/build-home.yml'
+      - '.github/workflows/build-service.yml'
+  workflow_dispatch:
+
+jobs:
+  app:
+    uses: ./.github/workflows/build-service.yml
+    with:
+      service: home
+      component: app
+      dockerfile: services/home/Dockerfile
+      context: services/home

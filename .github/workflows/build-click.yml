@@ -1,0 +1,26 @@
+name: Build Click
+on:
+  push:
+    branches: [main, release]
+    paths:
+      - 'services/click/**'
+      - '.github/workflows/build-click.yml'
+      - '.github/workflows/build-service.yml'
+  workflow_dispatch:
+
+jobs:
+  nginx:
+    uses: ./.github/workflows/build-service.yml
+    with:
+      service: click
+      component: nginx
+      dockerfile: services/click/Dockerfile.nginx
+      context: services/click
+
+  php:
+    uses: ./.github/workflows/build-service.yml
+    with:
+      service: click
+      component: php
+      dockerfile: services/click/Dockerfile.php
+      context: services/click

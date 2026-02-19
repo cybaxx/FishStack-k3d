@@ -3,14 +3,15 @@ kind: Ingress
 metadata:
   name: wiki-ingress
   annotations:
-    cert-manager.io/cluster-issuer: wetfish-letsencrypt
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
 spec:
+  ingressClassName: traefik
   tls:
   - hosts:
-    - wiki.staging.wetfish.net
-    secretName: wiki-tls
+    - staging-wiki.wetfish.net
   rules:
-  - host: wiki.staging.wetfish.net
+  - host: staging-wiki.wetfish.net
     http:
       paths:
       - path: /

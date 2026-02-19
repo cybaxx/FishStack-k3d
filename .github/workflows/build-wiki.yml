@@ -1,0 +1,26 @@
+name: Build Wiki
+on:
+  push:
+    branches: [main, release]
+    paths:
+      - 'services/wiki/**'
+      - '.github/workflows/build-wiki.yml'
+      - '.github/workflows/build-service.yml'
+  workflow_dispatch:
+
+jobs:
+  nginx:
+    uses: ./.github/workflows/build-service.yml
+    with:
+      service: wiki
+      component: nginx
+      dockerfile: services/wiki/Dockerfile.nginx
+      context: services/wiki
+
+  php:
+    uses: ./.github/workflows/build-service.yml
+    with:
+      service: wiki
+      component: php
+      dockerfile: services/wiki/Dockerfile.php
+      context: services/wiki

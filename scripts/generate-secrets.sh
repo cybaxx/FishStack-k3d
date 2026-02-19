@@ -35,7 +35,7 @@ esac
 
 generate_password() {
     if $USE_RANDOM; then
-        LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 24
+        openssl rand -base64 18
     else
         echo "$1"
     fi

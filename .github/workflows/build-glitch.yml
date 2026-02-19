@@ -1,0 +1,26 @@
+name: Build Glitch
+on:
+  push:
+    branches: [main, release]
+    paths:
+      - 'services/glitch/**'
+      - '.github/workflows/build-glitch.yml'
+      - '.github/workflows/build-service.yml'
+  workflow_dispatch:
+
+jobs:
+  nginx:
+    uses: ./.github/workflows/build-service.yml
+    with:
+      service: glitch
+      component: nginx
+      dockerfile: services/glitch/Dockerfile.nginx
+      context: services/glitch
+
+  php:
+    uses: ./.github/workflows/build-service.yml
+    with:
+      service: glitch
+      component: php
+      dockerfile: services/glitch/Dockerfile.php
+      context: services/glitch

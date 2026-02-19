@@ -10,7 +10,7 @@
 |---|---------|------------|
 | **Branch** | `main` | `release` |
 | **Namespace** | `wetfish-staging` | `wetfish-prod` |
-| **Hostnames** | `*.staging.wetfish.net` | `*.wetfish.net` |
+| **Hostnames** | `staging-<svc>.wetfish.net` / `staging.wetfish.net` | `<svc>.wetfish.net` / `wetfish.net` |
 | **Registry** | `ghcr.io/cybaxx/web-services-k8s` | `ghcr.io/cybaxx/web-services-k8s` |
 | **Image tags** | `staging-<component>` | `prod-<component>` |
 | **TLS** | cert-manager (Let's Encrypt) | cert-manager (Let's Encrypt) |
@@ -172,10 +172,13 @@ kubectl exec -i deployment/danger-mysql -n wetfish-staging -- \
 
 ```bash
 # Test each service endpoint
-for svc in wiki home glitch click danger; do
-  curl -s -o /dev/null -w "$svc.staging.wetfish.net -> HTTP %{http_code}\n" \
-    https://$svc.staging.wetfish.net
+for svc in wiki glitch click danger; do
+  curl -s -o /dev/null -w "staging-$svc.wetfish.net -> HTTP %{http_code}\n" \
+    https://staging-$svc.wetfish.net
 done
+# Home is at staging.wetfish.net (no prefix)
+curl -s -o /dev/null -w "staging.wetfish.net -> HTTP %{http_code}\n" \
+  https://staging.wetfish.net
 ```
 
 ---
@@ -272,10 +275,13 @@ kubectl get pods -n wetfish-prod
 kubectl get certificates -n wetfish-prod
 
 # Test endpoints
-for svc in wiki home glitch click danger; do
+for svc in wiki glitch click danger; do
   curl -s -o /dev/null -w "$svc.wetfish.net -> HTTP %{http_code}\n" \
     https://$svc.wetfish.net
 done
+# Home is at wetfish.net (no prefix)
+curl -s -o /dev/null -w "wetfish.net -> HTTP %{http_code}\n" \
+  https://wetfish.net
 ```
 
 ---

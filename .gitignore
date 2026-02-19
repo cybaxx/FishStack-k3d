@@ -3,6 +3,7 @@
 kubectl/
 secrets/
 *.env.local
+services/*/k8s/overlays/*/secret.yaml
 
 # Development
 .vscode/

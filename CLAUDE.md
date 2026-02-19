@@ -41,8 +41,8 @@ Kubernetes migration of wetfish web-services from Docker Compose to a k3d cluste
 | Environment | Namespace | Hostnames | Registry | Branch |
 |-------------|-----------|-----------|----------|--------|
 | dev | wetfish-dev | `*.wetfish.local` | `wetfish-registry:5000` (k3d local) | local builds |
-| staging | wetfish-staging | `*.staging.wetfish.net` | `ghcr.io/cybaxx/web-services-k8s` | `main` |
-| prod | wetfish-prod | `*.wetfish.net` | `ghcr.io/cybaxx/web-services-k8s` | `release` |
+| staging | wetfish-staging | `staging-<svc>.wetfish.net` / `staging.wetfish.net` | `ghcr.io/cybaxx/web-services-k8s` | `main` |
+| prod | wetfish-prod | `<svc>.wetfish.net` / `wetfish.net` | `ghcr.io/cybaxx/web-services-k8s` | `release` |
 
 ## Key Commands
 
@@ -117,8 +117,8 @@ Each service lives under `services/<name>/` with:
 - `src/` - Git submodule pointing to upstream wetfish repo (application source code)
 - `k8s/base/` - Environment-agnostic Kubernetes manifests (configmap, mysql, web, ingress, etc.)
 - `k8s/overlays/dev/` - Dev overlay (local registry, *.wetfish.local, local-path storage)
-- `k8s/overlays/staging/` - Staging overlay (GHCR, *.staging.wetfish.net)
-- `k8s/overlays/prod/` - Prod overlay (GHCR, *.wetfish.net)
+- `k8s/overlays/staging/` - Staging overlay (GHCR, staging-<svc>.wetfish.net)
+- `k8s/overlays/prod/` - Prod overlay (GHCR, <svc>.wetfish.net)
 - `config/` - K8s-modified config files (nginx.conf, php.ini, etc.)
 - `Dockerfile.*` - Container definitions (COPY paths reference `src/` subdir)
 

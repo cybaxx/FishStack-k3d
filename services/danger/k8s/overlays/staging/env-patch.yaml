@@ -9,4 +9,4 @@ spec:
       - name: php-fpm
         env:
         - name: SITE_URL
-          value: "https://danger.staging.wetfish.net"
+          value: "https://staging-danger.wetfish.net"

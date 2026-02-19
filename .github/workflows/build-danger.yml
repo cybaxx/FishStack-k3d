@@ -1,0 +1,26 @@
+name: Build Danger
+on:
+  push:
+    branches: [main, release]
+    paths:
+      - 'services/danger/**'
+      - '.github/workflows/build-danger.yml'
+      - '.github/workflows/build-service.yml'
+  workflow_dispatch:
+
+jobs:
+  nginx:
+    uses: ./.github/workflows/build-service.yml
+    with:
+      service: danger
+      component: nginx
+      dockerfile: services/danger/Dockerfile.nginx
+      context: services/danger
+
+  php:
+    uses: ./.github/workflows/build-service.yml
+    with:
+      service: danger
+      component: php
+      dockerfile: services/danger/Dockerfile.php
+      context: services/danger
