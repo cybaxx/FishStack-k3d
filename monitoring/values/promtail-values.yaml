@@ -6,6 +6,36 @@ config:
   clients:
     - url: http://loki.wetfish-monitoring.svc.cluster.local:3100/loki/api/v1/push
 
+  snippets:
+    extraScrapeConfigs: |
+      # Traefik access logs — shipped as structured JSON from container stdout
+      - job_name: traefik-access
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names: [wetfish-system]
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            action: keep
+            regex: traefik
+          - source_labels: [__meta_kubernetes_pod_node_name]
+            target_label: __host__
+          - replacement: /var/log/pods/*$1*/*/*.log
+            source_labels: [__meta_kubernetes_pod_uid]
+            target_label: __path__
+        pipeline_stages:
+          - json:
+              expressions:
+                router: RouterName
+                service: ServiceName
+                status: DownstreamStatus
+                method: RequestMethod
+          - labels:
+              router:
+              service:
+              status:
+              method:
+
 resources:
   requests:
     memory: "64Mi"

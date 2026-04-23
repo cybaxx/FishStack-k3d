@@ -1,0 +1,21 @@
+# NOTE: Requires prometheus-operator CRDs (ServiceMonitor).
+# deploy.sh will skip this gracefully if CRDs are not installed.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: traefik-metrics
+  namespace: wetfish-system
+  labels:
+    app: traefik
+    component: ingress-controller
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: traefik
+      component: ingress-controller
+  endpoints:
+  - port: metrics
+    path: /metrics
+    interval: 30s
+    scrapeTimeout: 10s
