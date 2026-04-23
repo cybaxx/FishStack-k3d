@@ -5,9 +5,9 @@ metadata:
   labels:
     app: danger
   annotations:
-    kubernetes.io/ingress.class: traefik
     traefik.ingress.kubernetes.io/router.priority: "100"
 spec:
+  ingressClassName: traefik
   rules:
   - host: PLACEHOLDER
     http:
