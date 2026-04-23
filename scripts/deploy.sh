@@ -56,7 +56,6 @@ show_usage() {
     echo "  $0 --env staging wiki        # Deploy wiki to staging"
     echo "  $0 --env prod wiki           # Deploy wiki to prod"
     echo "  $0 --env dev wiki delete     # Delete wiki from dev"
-    echo "  $0 monitoring                # Deploy monitoring stack"
     echo "  $0 traefik                   # Deploy Traefik"
     echo
     echo "Environments:"
@@ -65,10 +64,12 @@ show_usage() {
     echo "  prod     - Production, wetfish-prod namespace"
     echo
     echo "Available services:"
-    echo "  wiki, home, glitch, click, danger"
-    echo "  monitoring  - Full monitoring stack (Helm)"
-    echo "  traefik     - Ingress controller (Helm)"
+    echo "  wiki, home, glitch, click, danger, forum"
+    echo "  traefik     - Ingress controller (raw manifests)"
     echo "  cert-manager - TLS certificate manager (Helm)"
+    echo
+    echo "Monitoring: deploy FishVision separately"
+    echo "  kubectl apply -k /path/to/FishVision/k8s/overlays/dev"
     echo
     echo "Legacy usage (backward compat):"
     echo "  $0 wetfish-dev wiki          # Same as --env dev wiki"
@@ -155,88 +156,6 @@ show_deployment_status() {
     echo
     log_info "Ingress status:"
     kubectl get ingress -n "$namespace" -l app="$service"
-}
-
-# Deploy monitoring stack
-deploy_monitoring() {
-    log_info "Deploying monitoring stack..."
-
-    # Add Helm repositories
-    log_info "Adding Helm repositories..."
-    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-    helm repo add grafana https://grafana.github.io/helm-charts
-    helm repo update
-
-    # Deploy Prometheus stack
-    log_info "Installing Prometheus stack..."
-    if [[ -f "${PROJECT_DIR}/monitoring/values/prometheus-stack-values.yaml" ]]; then
-        helm upgrade --install prometheus prometheus-community/kube-prometheus-stack \
-            --namespace wetfish-monitoring \
-            --create-namespace \
-            --values "${PROJECT_DIR}/monitoring/values/prometheus-stack-values.yaml" \
-            --wait --timeout 10m
-    else
-        log_warning "Prometheus values file not found, using defaults"
-        helm upgrade --install prometheus prometheus-community/kube-prometheus-stack \
-            --namespace wetfish-monitoring \
-            --create-namespace \
-            --wait --timeout 10m
-    fi
-
-    # Deploy Loki
-    log_info "Installing Loki..."
-    if [[ -f "${PROJECT_DIR}/monitoring/values/loki-values.yaml" ]]; then
-        helm upgrade --install loki grafana/loki \
-            --namespace wetfish-monitoring \
-            --values "${PROJECT_DIR}/monitoring/values/loki-values.yaml" \
-            --wait --timeout 10m
-    else
-        log_warning "Loki values file not found, using defaults"
-        helm upgrade --install loki grafana/loki \
-            --namespace wetfish-monitoring \
-            --wait --timeout 10m
-    fi
-
-    # Deploy Tempo
-    log_info "Installing Tempo..."
-    if [[ -f "${PROJECT_DIR}/monitoring/values/tempo-values.yaml" ]]; then
-        helm upgrade --install tempo grafana/tempo \
-            --namespace wetfish-monitoring \
-            --values "${PROJECT_DIR}/monitoring/values/tempo-values.yaml" \
-            --wait --timeout 10m
-    else
-        log_warning "Tempo values file not found, using defaults"
-        helm upgrade --install tempo grafana/tempo \
-            --namespace wetfish-monitoring \
-            --wait --timeout 10m
-    fi
-
-    # Deploy Promtail (log collector)
-    log_info "Installing Promtail..."
-    if [[ -f "${PROJECT_DIR}/monitoring/values/promtail-values.yaml" ]]; then
-        helm upgrade --install promtail grafana/promtail \
-            --namespace wetfish-monitoring \
-            --values "${PROJECT_DIR}/monitoring/values/promtail-values.yaml" \
-            --wait --timeout 5m
-    else
-        log_warning "Promtail values file not found, using defaults"
-        helm upgrade --install promtail grafana/promtail \
-            --namespace wetfish-monitoring \
-            --wait --timeout 5m
-    fi
-
-    log_success "Monitoring stack deployed"
-
-    # Show access info
-    echo
-    log_info "Monitoring Access URLs (add to /etc/hosts):"
-    echo "  Grafana:       http://grafana.wetfish.local"
-    echo "  Prometheus:    http://prometheus.wetfish.local"
-    echo "  Alertmanager:  http://alertmanager.wetfish.local"
-    echo "  Loki:          http://loki.wetfish.local"
-    echo "  Tempo:         http://tempo.wetfish.local"
-    echo
-    log_info "Grafana default credentials: admin / admin"
 }
 
 # Deploy cert-manager
@@ -367,9 +286,6 @@ main() {
     fi
 
     case "$service" in
-        "monitoring")
-            deploy_monitoring
-            ;;
         "cert-manager")
             deploy_cert_manager
             ;;

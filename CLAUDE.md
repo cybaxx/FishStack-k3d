@@ -17,7 +17,7 @@ Kubernetes migration of wetfish web-services from Docker Compose to a k3d cluste
 - Forum service deferred (complex SMF setup, needs separate planning)
 - GitHub Actions CI/CD workflows for all 5 services (reusable workflow pattern)
 - Infrastructure deployed (Traefik, cert-manager, namespaces for dev/staging/prod)
-- **Monitoring stack deployed**: Prometheus, Grafana, Alertmanager, Loki, Tempo, Promtail
+- **Monitoring**: FishVision (`~/git/FishVision`) is the source of truth — deploy with `kubectl apply -k /path/to/FishVision/k8s/overlays/dev`. Services expose metrics via Traefik `:8082/metrics`.
 - Scripts complete (up, deploy, cleanup, hosts, generate-secrets, testing)
 
 ### Known Issues & Lessons Learned
@@ -34,7 +34,7 @@ Kubernetes migration of wetfish web-services from Docker Compose to a k3d cluste
 - Security contexts: nginx, php-fpm, and MariaDB images all run as root. Do NOT use `runAsNonRoot: true` or `capabilities: drop: ["ALL"]` on these containers. Traefik is the exception (supports non-root via `runAsUser: 65532`).
 - Wiki liveness probe uses `tcpSocket` (not `httpGet`) because the app returns 500 before DB schema is loaded
 - Traefik HTTP→HTTPS redirect is disabled in dev (breaks local access on port 8080)
-- ServiceMonitor CRDs only exist when monitoring stack is deployed; deploy scripts tolerate partial apply failures
+- Monitoring is handled by FishVision (separate repo/deploy) — no prometheus-operator CRDs in the cluster
 
 ## Environments
 
@@ -50,7 +50,6 @@ Kubernetes migration of wetfish web-services from Docker Compose to a k3d cluste
 ```bash
 ./scripts/up.sh                          # Full stack bring-up (cluster + infra + builds + deploy)
 ./scripts/up.sh --skip-cluster --skip-build  # Redeploy without rebuilding
-./scripts/up.sh --with-monitoring        # Include monitoring stack
 ./scripts/setup-dev.sh                   # Create k3d cluster only (1 server, 2 agents, local registry on :5000)
 ./scripts/cleanup.sh                     # Tear down cluster and Docker resources
 sudo ./scripts/setup-hosts.sh            # Add service DNS entries to /etc/hosts
@@ -75,7 +74,6 @@ docker push localhost:5000/wiki:php
 ./scripts/deploy.sh --env staging wiki        # Deploy wiki to staging
 ./scripts/deploy.sh --env prod wiki           # Deploy wiki to prod
 ./scripts/deploy.sh --env dev wiki delete     # Remove wiki from dev
-./scripts/deploy.sh monitoring                # Deploy monitoring stack (Helm)
 ./scripts/deploy.sh traefik                   # Deploy Traefik (Helm)
 ```
 
@@ -93,7 +91,6 @@ kubectl get pods -n wetfish-dev
 kubectl logs deployment/wiki-web -n wetfish-dev -c nginx -f
 kubectl logs deployment/wiki-web -n wetfish-dev -c php-fpm -f
 kubectl exec -it deployment/wiki-web -n wetfish-dev -c php-fpm -- bash
-kubectl port-forward svc/prometheus-grafana 3000:80 -n wetfish-monitoring
 ```
 
 ### Kustomize Dry-Run
@@ -110,7 +107,6 @@ kubectl kustomize services/wiki/k8s/overlays/staging/
 - **wetfish-dev** - Development services (wiki, home, glitch, click, danger)
 - **wetfish-staging** - Staging services
 - **wetfish-prod** - Production services
-- **wetfish-monitoring** - Observability stack (Prometheus, Grafana, Loki, Tempo)
 
 ### Service Layout (Kustomize)
 Each service lives under `services/<name>/` with:
@@ -145,17 +141,15 @@ Base manifests use placeholder image names (e.g., `WIKI_NGINX_IMAGE:latest`) tha
 - **Access**: `http://wiki.wetfish.local` (dev, requires /etc/hosts entry)
 
 ### Monitoring Stack
-Deployed via Helm charts in `wetfish-monitoring` namespace with custom values in `monitoring/values/`:
 
-| Helm Release | Chart | Purpose | Access |
-|-------------|-------|---------|--------|
-| `prometheus` | kube-prometheus-stack | Prometheus + Grafana + Alertmanager + node-exporter + kube-state-metrics | `grafana.wetfish.local:8080` (admin/admin) |
-| `loki` | grafana/loki | Log aggregation (SingleBinary mode, filesystem storage) | Internal only |
-| `tempo` | grafana/tempo | Distributed tracing (OTLP receiver) | Internal only |
-| `promtail` | grafana/promtail | Log collector DaemonSet shipping to Loki | Internal only |
+**FishVision** (`~/git/FishVision`) is the canonical monitoring stack. It owns all Prometheus scrape configs, alert rules, Grafana dashboards, and the IRC alerting + LLM bot pipeline.
 
-Grafana has 4 pre-configured datasources: Prometheus (default), Alertmanager, Loki, Tempo.
-Wiki service has ServiceMonitors (`wiki-web-metrics`, `wiki-mysql-metrics`) for Prometheus discovery.
+Deploy into the cluster:
+```bash
+kubectl apply -k ~/git/FishVision/k8s/overlays/dev
+```
+
+Traefik exposes metrics at `:8082/metrics` — FishVision's Prometheus scrapes this via static config. No ServiceMonitor CRDs needed; prometheus-operator is not installed.
 
 ## Git Workflow
 
