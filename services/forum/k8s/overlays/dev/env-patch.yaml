@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forum-web
+spec:
+  template:
+    spec:
+      containers:
+      - name: php-fpm
+        env:
+        - name: SITE_BOARDURL
+          value: "https://forum.wetfish.local"
+        - name: SITE_COOKIE_NAME
+          value: "SMFDev"

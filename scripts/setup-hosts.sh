@@ -44,6 +44,7 @@ HOSTS=(
     "127.0.0.1 glitch.wetfish.local"
     "127.0.0.1 click.wetfish.local"
     "127.0.0.1 danger.wetfish.local"
+    "127.0.0.1 forum.wetfish.local"
     "127.0.0.1 grafana.wetfish.local"
     "127.0.0.1 prometheus.wetfish.local"
     "127.0.0.1 alertmanager.wetfish.local"

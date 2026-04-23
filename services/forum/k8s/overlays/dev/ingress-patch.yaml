@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: forum-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: wetfish-selfsigned
+spec:
+  tls:
+  - hosts:
+    - forum.wetfish.local
+    secretName: forum-tls
+  rules:
+  - host: forum.wetfish.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: forum-web
+            port:
+              number: 80

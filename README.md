@@ -16,7 +16,8 @@ Kubernetes migration of wetfish web-services with observability stack (Prometheu
 │                    │  ├─ Home          │  ├─ Grafana        │
 │                    │  ├─ Glitch        │  ├─ Loki           │
 │                    │  ├─ Click         │  ├─ Tempo          │
-│                    │  └─ Danger        │  └─ AlertManager   │
+│                    │  ├─ Danger        │  └─ AlertManager   │
+│                    │  └─ Forum         │                    │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -29,7 +30,7 @@ Kubernetes migration of wetfish web-services with observability stack (Prometheu
 | **glitch** | PHP 5.6 + nginx (sidecar) | None | Running |
 | **click** | PHP 5.6 + nginx (sidecar) | MariaDB 10.10 | Running |
 | **danger** | PHP 5.6 + nginx (sidecar) | MariaDB 10.10 | Running |
-| **forum** | SMF 2.1.6 + PHP 8.4 | MariaDB | Deferred |
+| **forum** | SMF 2.1.6 + PHP 8.4 | MariaDB 10.11 | In Progress (dev) |
 
 ---
 

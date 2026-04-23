@@ -1,0 +1,99 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: forum-nginx-config
+  labels:
+    app: forum
+    component: web
+data:
+  nginx.conf: |
+    server {
+        listen 80;
+        server_name _;
+
+        root /var/www/forum;
+        index index.php;
+        disable_symlinks off;
+
+        client_max_body_size 64M;
+
+        # Security headers
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+        # Block sensitive files
+        location ~ /\.(git|env|htaccess|htpasswd) {
+            deny all;
+            return 404;
+        }
+
+        # Static assets in persistent dirs (served via symlinks from wwwroot → appdata PVC)
+        location ~* ^/(Themes|attachments|avatars|Smileys|images|custom_avatar)/ {
+            access_log off;
+            expires 7d;
+            add_header Cache-Control "public";
+            try_files $uri =404;
+        }
+
+        # Static asset caching
+        location ~* \.(?:css|js|map|png|jpe?g|gif|svg|webp|ico|woff2?|ttf|eot)$ {
+            try_files $uri =404;
+            access_log off;
+            expires 7d;
+            add_header Cache-Control "public";
+        }
+
+        # PHP handler (php-fpm sidecar on 127.0.0.1:9000)
+        location ~ \.php$ {
+            try_files $uri =404;
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_index index.php;
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_read_timeout 300;
+        }
+
+        # SMF pretty-URL fallback
+        location / {
+            try_files $uri $uri/ /index.php?$args;
+        }
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: forum-php-config
+  labels:
+    app: forum
+    component: web
+data:
+  php-fpm-pool.conf: |
+    [www]
+    user  = www-data
+    group = www-data
+    listen = 9000
+    pm = dynamic
+    pm.max_children    = 10
+    pm.start_servers   = 2
+    pm.min_spare_servers = 1
+    pm.max_spare_servers = 4
+    access.log = /proc/self/fd/2
+    catch_workers_output = yes
+
+    ; Pass k8s secret env vars into php-fpm workers
+    env[DB_HOST]          = $DB_HOST
+    env[DB_PORT]          = $DB_PORT
+    env[DB_NAME]          = $DB_NAME
+    env[DB_USERNAME]      = $DB_USERNAME
+    env[DB_PASSWORD]      = $DB_PASSWORD
+    env[SITE_NAME]        = $SITE_NAME
+    env[SITE_BOARDURL]    = $SITE_BOARDURL
+    env[SITE_COOKIE_NAME] = $SITE_COOKIE_NAME
+    env[SITE_LANGUAGE]    = $SITE_LANGUAGE
+    env[OUTGOING_EMAIL]   = $OUTGOING_EMAIL
+    env[SMF_AUTH_SECRET]  = $SMF_AUTH_SECRET
+
+    php_flag[display_errors]        = off
+    php_admin_value[error_log]      = /proc/self/fd/2
+    php_admin_flag[log_errors]      = on
