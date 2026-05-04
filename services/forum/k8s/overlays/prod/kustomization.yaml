@@ -3,13 +3,12 @@ kind: Kustomization
 namespace: wetfish-prod
 resources:
   - ../../base
-  - secret.yaml
 images:
-  - name: DANGER_NGINX_IMAGE
-    newName: ghcr.io/cybaxx/web-services-k8s/danger
+  - name: FORUM_NGINX_IMAGE
+    newName: ghcr.io/cybaxx/web-services-k8s/forum
     newTag: prod-nginx
-  - name: DANGER_PHP_IMAGE
-    newName: ghcr.io/cybaxx/web-services-k8s/danger
+  - name: FORUM_PHP_IMAGE
+    newName: ghcr.io/cybaxx/web-services-k8s/forum
     newTag: prod-php
 patches:
   - path: ingress-patch.yaml

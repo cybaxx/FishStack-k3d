@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: wetfish-prod
 resources:
   - ../../base
+  - secret.yaml
 images:
   - name: WIKI_NGINX_IMAGE
     newName: ghcr.io/cybaxx/web-services-k8s/wiki
@@ -13,3 +14,4 @@ images:
 patches:
   - path: ingress-patch.yaml
   - path: env-patch.yaml
+  - path: pull-secret-patch.yaml
