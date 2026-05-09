@@ -6,10 +6,10 @@ resources:
 images:
   - name: FORUM_NGINX_IMAGE
     newName: ghcr.io/cybaxx/web-services-k8s/forum
-    newTag: prod-nginx
+    newTag: staging-nginx
   - name: FORUM_PHP_IMAGE
     newName: ghcr.io/cybaxx/web-services-k8s/forum
-    newTag: prod-php
+    newTag: staging-php
 patches:
   - path: ingress-patch.yaml
   - path: env-patch.yaml

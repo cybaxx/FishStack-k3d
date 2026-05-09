@@ -1,0 +1,30 @@
+name: Build Forum
+on:
+  push:
+    branches: [main, release]
+    paths:
+      - 'services/forum/**'
+      - '.github/workflows/build-forum.yml'
+      - '.github/workflows/build-service.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  nginx:
+    uses: ./.github/workflows/build-service.yml
+    with:
+      service: forum
+      component: nginx
+      dockerfile: services/forum/Dockerfile.nginx
+      context: services/forum
+
+  php:
+    uses: ./.github/workflows/build-service.yml
+    with:
+      service: forum
+      component: php
+      dockerfile: services/forum/Dockerfile.php
+      context: services/forum
