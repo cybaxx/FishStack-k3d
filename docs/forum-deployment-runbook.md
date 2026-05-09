@@ -113,6 +113,46 @@ WHERE description LIKE '%wetfishonline.com%';"
 >
 > **Prod action item:** Update the board descriptions in the live forum admin panel to use the relative path so future dumps are portable.
 
+### Fix custom avatar URL
+
+The `custom_avatar_url` setting in `smf_settings` is stored as an absolute URL from the dump origin and must be updated:
+
+```bash
+kubectl exec -i deployment/forum-mysql -n wetfish-dev -- \
+  mysql -uforumuser -pforumpass forumdb -e "
+UPDATE smf_settings
+SET value = 'http://forum.wetfish.local:8080/custom_avatar'
+WHERE variable = 'custom_avatar_url';"
+```
+
+For staging/prod, replace the URL with the environment's base URL (e.g. `https://staging-forums.wetfish.net/custom_avatar`).
+
+### Insert boardurl setting
+
+`boardurl` may be absent from the dump. Insert or update it:
+
+```bash
+kubectl exec -i deployment/forum-mysql -n wetfish-dev -- \
+  mysql -uforumuser -pforumpass forumdb -e "
+INSERT INTO smf_settings (variable, value)
+VALUES ('boardurl', 'http://forum.wetfish.local:8080')
+ON DUPLICATE KEY UPDATE value = 'http://forum.wetfish.local:8080';"
+```
+
+### Fix YouTube embed regex (SAVE mod)
+
+The Simple Audio Video Embedder (SAVE) ships with a YouTube regex that requires a subdomain before `youtube.` — bare `youtube.com` links fail. Patch after mod install:
+
+```bash
+kubectl exec -i deployment/forum-mysql -n wetfish-dev -- mysql -uforumuser -pforumpass forumdb << 'EOF'
+UPDATE smf_mediapro_sites
+SET regexmatch = 'htt(p|ps)://(www\\.)?youtube\\.[\\w]+/watch[(\\?|\\?feature=player_embedded&amp;)\\#!]+v=([\\w-]+)[\\w&;+-]*[\\#&;t=]*([\\d]*)[&;10wshdq=]*'
+WHERE id = 1;
+EOF
+```
+
+> **Root cause:** The original regex used `[\\w.]+youtube\\.` which requires at least one character before `youtube.` — bare `youtube.com` has no subdomain so it never matches. The fix makes the `www.` optional with `(www\\.)?`.
+
 ### Clear SMF cache
 
 After any DB URL changes, clear SMF's file cache:
@@ -215,3 +255,19 @@ The upgrade pipeline produces `smf_data.sql` with `new_forum` as the database na
 ### SITE_BOARDURL must match the environment
 
 `services/forum/k8s/overlays/dev/env-patch.yaml` must set `SITE_BOARDURL` to `http://forum.wetfish.local:8080` (HTTP, with port). Using `https://` or omitting the port causes redirect loops or broken asset URLs.
+
+### custom_avatar_url is absolute in the dump
+
+`smf_settings.custom_avatar_url` is stored as an absolute URL from the source environment (`http://127.0.0.1:8080/custom_avatar`). Custom avatar uploads will be served from the wrong host in any other environment. Update via Step 5.
+
+### boardurl may be missing from the dump
+
+The `boardurl` key in `smf_settings` is sometimes absent from the migrated dump. Insert it explicitly in Step 5.
+
+### SAVE mod YouTube regex requires www. subdomain
+
+The Simple Audio Video Embedder ships with a YouTube regex that does not match bare `youtube.com` URLs (only `www.youtube.com`). Apply the `smf_mediapro_sites` patch in Step 5 after mod install.
+
+### og:image missing — wetfish-online-social.png not in FishTank theme
+
+`Themes/fishtank/images/wetfish-online-social.png` is referenced by the Optimus mod for social share previews but is not included in the distributed theme archive. The `og:image` meta tag will be absent until this file is added to the theme or bundled in the Docker image.
