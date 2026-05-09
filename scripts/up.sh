@@ -283,13 +283,6 @@ echo "Services:"
 for svc in "${SERVICES[@]}"; do
     echo "  http://${svc}.wetfish.local:8080"
 done
-if $WITH_MONITORING; then
-    echo ""
-    echo "Monitoring:"
-    echo "  http://grafana.wetfish.local:8080       (admin/admin)"
-    echo "  http://prometheus.wetfish.local:8080"
-    echo "  http://alertmanager.wetfish.local:8080"
-fi
 echo ""
 echo "Load DB schemas (first deploy only):"
 echo "  kubectl exec -i deployment/wiki-mysql -n wetfish-dev -- mysql -uroot -pwikipass wikidb < services/wiki/src/wwwroot/src/schema.sql"
