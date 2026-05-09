@@ -41,6 +41,9 @@ RUN set -eu; \
   find . -type d -exec chmod 755 {} \; ; \
   find . -type f -exec chmod 644 {} \;
 
+# Copy fish avatar builder assets (WFIE item images, bodies, equipment, coins)
+COPY fish/ /var/www/forum/fish/
+
 # Copy env-driven Settings.php
 COPY config/Settings.php /var/www/forum/Settings.php
 COPY config/Settings.php /var/www/forum/Settings_bak.php

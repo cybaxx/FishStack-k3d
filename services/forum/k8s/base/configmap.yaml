@@ -29,7 +29,7 @@ data:
         }
 
         # Static assets in persistent dirs (served via symlinks from wwwroot → appdata PVC)
-        location ~* ^/(Themes|attachments|avatars|Smileys|images|custom_avatar)/ {
+        location ~* ^/(Themes|attachments|avatars|Smileys|images|custom_avatar|fish)/ {
             access_log off;
             expires 7d;
             add_header Cache-Control "public";
