@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: wetfish-prod
 resources:
   - ../../base
+  - secret.yaml
 images:
   - name: CLICK_NGINX_IMAGE
     newName: ghcr.io/cybaxx/web-services-k8s/click
@@ -12,3 +13,4 @@ images:
     newTag: prod-php
 patches:
   - path: ingress-patch.yaml
+  - path: pull-secret-patch.yaml

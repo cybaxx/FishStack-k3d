@@ -9,3 +9,4 @@ images:
     newTag: prod-app
 patches:
   - path: ingress-patch.yaml
+  - path: pull-secret-patch.yaml

@@ -12,3 +12,4 @@ images:
     newTag: prod-php
 patches:
   - path: ingress-patch.yaml
+  - path: pull-secret-patch.yaml

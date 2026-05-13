@@ -11,6 +11,7 @@ PERSIST_DIRS="
   attachments
   avatars
   custom_avatar
+  fish
   Packages
   Smileys
   Themes

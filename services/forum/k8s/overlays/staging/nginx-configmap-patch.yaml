@@ -1,0 +1,112 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: forum-nginx-config
+data:
+  nginx.conf: |
+    server {
+        listen 80;
+        server_name _;
+
+        root /var/www/forum;
+        index index.php;
+        disable_symlinks off;
+
+        client_max_body_size 64M;
+
+        # Security headers
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+        # Block sensitive files
+        location ~ /\.(git|env|htaccess|htpasswd) {
+            deny all;
+            return 404;
+        }
+
+        # Persistent user content dirs — served directly from appdata PVC via alias
+        location ^~ /Themes/ {
+            alias /var/www/appdata/Themes/;
+            access_log off;
+            expires 7d;
+            add_header Cache-Control "public";
+            try_files $uri =404;
+        }
+        location ^~ /attachments/ {
+            alias /var/www/appdata/attachments/;
+            access_log off;
+            expires 7d;
+            add_header Cache-Control "public";
+            try_files $uri =404;
+        }
+        location ^~ /avatars/ {
+            alias /var/www/appdata/avatars/;
+            access_log off;
+            expires 7d;
+            add_header Cache-Control "public";
+            try_files $uri =404;
+        }
+        location ^~ /custom_avatar/ {
+            alias /var/www/appdata/custom_avatar/;
+            access_log off;
+            expires 7d;
+            add_header Cache-Control "public";
+            try_files $uri =404;
+        }
+        location ^~ /Smileys/ {
+            alias /var/www/appdata/Smileys/;
+            access_log off;
+            expires 7d;
+            add_header Cache-Control "public";
+            try_files $uri =404;
+        }
+        location ^~ /images/ {
+            alias /var/www/appdata/images/;
+            access_log off;
+            expires 7d;
+            add_header Cache-Control "public";
+            try_files $uri =404;
+        }
+        location ^~ /fish/ {
+            alias /var/www/appdata/fish/;
+            access_log off;
+            expires 7d;
+            add_header Cache-Control "public";
+            try_files $uri =404;
+        }
+
+        # Static asset caching
+        location ~* \.(?:css|js|map|png|jpe?g|gif|svg|webp|ico|woff2?|ttf|eot)$ {
+            try_files $uri =404;
+            access_log off;
+            expires 7d;
+            add_header Cache-Control "public";
+        }
+
+        # Proxy wiki uploads — forum posts embed /upload/ links served by the
+        # in-cluster wiki-web service, avoiding cross-origin DNS dependency.
+        location /upload/ {
+            proxy_pass http://wiki-web/upload/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            access_log off;
+            expires 7d;
+            add_header Cache-Control "public";
+        }
+
+        # PHP handler (php-fpm sidecar on 127.0.0.1:9000)
+        location ~ \.php$ {
+            try_files $uri =404;
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_index index.php;
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_read_timeout 300;
+        }
+
+        # SMF pretty-URL fallback
+        location / {
+            try_files $uri $uri/ /index.php?$args;
+        }
+    }

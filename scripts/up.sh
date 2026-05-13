@@ -16,7 +16,6 @@ REGISTRY="localhost:${REGISTRY_PORT}"
 SKIP_CLUSTER=false
 SKIP_BUILD=false
 SKIP_HOSTS=false
-WITH_MONITORING=false
 
 # Colors
 RED='\033[0;31m'
@@ -39,24 +38,23 @@ while [[ $# -gt 0 ]]; do
         --skip-cluster)    SKIP_CLUSTER=true; shift ;;
         --skip-build)      SKIP_BUILD=true; shift ;;
         --skip-hosts)      SKIP_HOSTS=true; shift ;;
-        --with-monitoring) WITH_MONITORING=true; shift ;;
         -h|--help)
-            echo "Usage: $0 [--skip-cluster] [--skip-build] [--skip-hosts] [--with-monitoring]"
+            echo "Usage: $0 [--skip-cluster] [--skip-build] [--skip-hosts]"
             echo ""
             echo "Brings up the entire wetfish dev stack:"
             echo "  1. Creates k3d cluster (or reuses existing)"
             echo "  2. Deploys infrastructure (namespaces, Traefik, cert-manager)"
             echo "  3. Builds and pushes all service images"
             echo "  4. Generates secrets"
-            echo "  5. Deploys all 5 services"
-            echo "  6. (Optional) Deploys monitoring stack"
-            echo "  7. Configures /etc/hosts (requires sudo)"
+            echo "  5. Deploys all services"
+            echo "  6. Configures /etc/hosts (requires sudo)"
+            echo ""
+            echo "  Monitoring: deploy FishVision separately — kubectl apply -k /path/to/FishVision/k8s/overlays/dev"
             echo ""
             echo "Options:"
             echo "  --skip-cluster     Reuse existing cluster, don't recreate"
             echo "  --skip-build       Skip Docker image builds (use existing images)"
             echo "  --skip-hosts       Skip /etc/hosts configuration"
-            echo "  --with-monitoring  Also deploy monitoring stack (Prometheus, Grafana, Loki, Tempo)"
             exit 0
             ;;
         *) log_error "Unknown option: $1"; exit 1 ;;
@@ -243,47 +241,6 @@ for svc in wiki click danger; do
     fi
 done
 
-# ─── Monitoring (optional) ─────────────────────────────────────────────────
-
-if $WITH_MONITORING; then
-    log_step "Deploying monitoring stack"
-
-    log_info "Adding Helm repositories..."
-    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts >/dev/null 2>&1
-    helm repo add grafana https://grafana.github.io/helm-charts >/dev/null 2>&1
-    helm repo update >/dev/null 2>&1
-
-    log_info "Installing kube-prometheus-stack (Prometheus + Grafana + Alertmanager)..."
-    helm upgrade --install prometheus prometheus-community/kube-prometheus-stack \
-        --namespace wetfish-monitoring \
-        --values "$PROJECT_DIR/monitoring/values/prometheus-stack-values.yaml" \
-        --wait --timeout 10m
-    log_success "kube-prometheus-stack ready"
-
-    log_info "Installing Loki..."
-    helm upgrade --install loki grafana/loki \
-        --namespace wetfish-monitoring \
-        --values "$PROJECT_DIR/monitoring/values/loki-values.yaml" \
-        --wait --timeout 10m
-    log_success "Loki ready"
-
-    log_info "Installing Tempo..."
-    helm upgrade --install tempo grafana/tempo \
-        --namespace wetfish-monitoring \
-        --values "$PROJECT_DIR/monitoring/values/tempo-values.yaml" \
-        --wait --timeout 5m
-    log_success "Tempo ready"
-
-    log_info "Installing Promtail..."
-    helm upgrade --install promtail grafana/promtail \
-        --namespace wetfish-monitoring \
-        --values "$PROJECT_DIR/monitoring/values/promtail-values.yaml" \
-        --wait --timeout 5m
-    log_success "Promtail ready"
-
-    log_success "Monitoring stack deployed"
-fi
-
 # ─── /etc/hosts ─────────────────────────────────────────────────────────────
 
 if ! $SKIP_HOSTS; then
@@ -326,13 +283,6 @@ echo "Services:"
 for svc in "${SERVICES[@]}"; do
     echo "  http://${svc}.wetfish.local:8080"
 done
-if $WITH_MONITORING; then
-    echo ""
-    echo "Monitoring:"
-    echo "  http://grafana.wetfish.local:8080       (admin/admin)"
-    echo "  http://prometheus.wetfish.local:8080"
-    echo "  http://alertmanager.wetfish.local:8080"
-fi
 echo ""
 echo "Load DB schemas (first deploy only):"
 echo "  kubectl exec -i deployment/wiki-mysql -n wetfish-dev -- mysql -uroot -pwikipass wikidb < services/wiki/src/wwwroot/src/schema.sql"

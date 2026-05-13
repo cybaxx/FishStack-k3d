@@ -6,4 +6,3 @@ resources:
   - mysql-config.yaml
   - web.yaml
   - ingress.yaml
-  - monitoring.yaml

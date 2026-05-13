@@ -29,11 +29,3 @@ metadata:
   labels:
     name: wetfish-prod
     purpose: production
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: wetfish-monitoring
-  labels:
-    name: wetfish-monitoring
-    purpose: observability

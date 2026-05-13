@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: wetfish-prod
+resources:
+  - ../../base
+images:
+  - name: FORUM_NGINX_IMAGE
+    newName: ghcr.io/cybaxx/web-services-k8s/forum
+    newTag: prod-nginx
+  - name: FORUM_PHP_IMAGE
+    newName: ghcr.io/cybaxx/web-services-k8s/forum
+    newTag: prod-php
+patches:
+  - path: ingress-patch.yaml
+  - path: env-patch.yaml
+  - path: pull-secret-patch.yaml
