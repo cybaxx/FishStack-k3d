@@ -28,8 +28,52 @@ data:
             return 404;
         }
 
-        # Static assets in persistent dirs (served via symlinks from wwwroot → appdata PVC)
-        location ~* ^/(Themes|attachments|avatars|Smileys|images|custom_avatar|fish)/ {
+        # Persistent user content dirs — served directly from appdata PVC via alias
+        # (avoids symlink complexity; appdata mounted at /var/www/appdata)
+        location ^~ /Themes/ {
+            alias /var/www/appdata/Themes/;
+            access_log off;
+            expires 7d;
+            add_header Cache-Control "public";
+            try_files $uri =404;
+        }
+        location ^~ /attachments/ {
+            alias /var/www/appdata/attachments/;
+            access_log off;
+            expires 7d;
+            add_header Cache-Control "public";
+            try_files $uri =404;
+        }
+        location ^~ /avatars/ {
+            alias /var/www/appdata/avatars/;
+            access_log off;
+            expires 7d;
+            add_header Cache-Control "public";
+            try_files $uri =404;
+        }
+        location ^~ /custom_avatar/ {
+            alias /var/www/appdata/custom_avatar/;
+            access_log off;
+            expires 7d;
+            add_header Cache-Control "public";
+            try_files $uri =404;
+        }
+        location ^~ /Smileys/ {
+            alias /var/www/appdata/Smileys/;
+            access_log off;
+            expires 7d;
+            add_header Cache-Control "public";
+            try_files $uri =404;
+        }
+        location ^~ /images/ {
+            alias /var/www/appdata/images/;
+            access_log off;
+            expires 7d;
+            add_header Cache-Control "public";
+            try_files $uri =404;
+        }
+        location ^~ /fish/ {
+            alias /var/www/appdata/fish/;
             access_log off;
             expires 7d;
             add_header Cache-Control "public";
