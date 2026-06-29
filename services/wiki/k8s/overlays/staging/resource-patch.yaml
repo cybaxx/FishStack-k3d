@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wiki-mysql
+spec:
+  template:
+    spec:
+      containers:
+      - name: mysql
+        resources:
+          requests:
+            memory: "48Mi"
+            cpu: "50m"
+          limits:
+            memory: "160Mi"
+            cpu: "300m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wiki-web
+spec:
+  template:
+    spec:
+      containers:
+      - name: nginx
+        resources:
+          requests:
+            memory: "12Mi"
+            cpu: "25m"
+          limits:
+            memory: "48Mi"
+            cpu: "100m"
+      - name: php-fpm
+        resources:
+          requests:
+            memory: "48Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "300m"

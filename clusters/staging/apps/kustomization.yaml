@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - wiki.yaml
   - home.yaml
+  - forum.yaml
   - glitch.yaml
   - click.yaml
   - danger.yaml

@@ -15,3 +15,5 @@ patches:
   - path: env-patch.yaml
   - path: pull-secret-patch.yaml
   - path: nginx-configmap-patch.yaml
+  - path: resource-patch.yaml
+  - path: storage-patch.yaml

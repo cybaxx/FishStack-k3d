@@ -9,3 +9,4 @@ images:
     newTag: staging-app
 patches:
   - path: ingress-patch.yaml
+  - path: resource-patch.yaml

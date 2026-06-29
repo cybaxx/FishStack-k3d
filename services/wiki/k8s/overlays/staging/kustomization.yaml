@@ -13,3 +13,4 @@ images:
 patches:
   - path: ingress-patch.yaml
   - path: env-patch.yaml
+  - path: resource-patch.yaml
