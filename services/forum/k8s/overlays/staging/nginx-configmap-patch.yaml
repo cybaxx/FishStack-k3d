@@ -10,7 +10,7 @@ data:
 
         root /var/www/forum;
         index index.php;
-        disable_symlinks off;
+        disable_symlinks if_not_owner;
 
         client_max_body_size 64M;
 
