@@ -3,9 +3,12 @@ on:
   push:
     branches: [main, release]
     paths:
-      - 'services/forum/**'
-      - '.github/workflows/build-forum.yml'
-      - '.github/workflows/build-service.yml'
+      - "services/forum/Dockerfile.*"
+      - "services/forum/config/**"
+      - "services/forum/fish/**"
+      - "services/forum/wf-item-econ/**"
+      - ".github/workflows/build-forum.yml"
+      - ".github/workflows/build-service.yml"
   workflow_dispatch:
 
 permissions:
