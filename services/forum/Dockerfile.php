@@ -32,8 +32,8 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /var/www/forum
 
-# Copy SMF files from local src/ directory (pre-extracted SMF 2.1.6)
-# src/ is gitignored — populate with: cp -r <forum-repo>/projects/smf-docker/app src
+# Copy SMF files from src/ (populated by CI from SimpleMachines/SMF v2.1.7 release)
+# src/ is gitignored — the CI workflow downloads and prepares it automatically
 COPY src/ .
 
 RUN set -eu; \
