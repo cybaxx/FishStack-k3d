@@ -17,7 +17,7 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  SMF_VERSION: "2.1.7"
+  SMF_VERSION: "2.1.6"
 
 jobs:
   nginx:
