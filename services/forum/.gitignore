@@ -1,3 +1,3 @@
-# SMF application files — copy from wetfish/forum repo:
-#   cp -r projects/smf-docker/app services/forum/src
+# SMF application files — populated by CI workflow (build-forum.yml)
+# from SimpleMachines/SMF v2.1.7 release
 src/

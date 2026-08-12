@@ -133,6 +133,12 @@ spec:
           value: "english"
         - name: OUTGOING_EMAIL
           value: "noreply@wetfishonline.com"
+        - name: SMF_CACHE_ENABLE
+          value: "1"
+        - name: SMF_CACHE_ACCELERATOR
+          value: "FileBased"
+        - name: SMF_CACHE_DIR
+          value: "/var/www/forum/cache"
         resources:
           requests:
             memory: "256Mi"
