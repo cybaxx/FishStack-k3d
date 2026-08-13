@@ -9,6 +9,6 @@ spec:
       - name: php-fpm
         env:
         - name: SITE_BOARDURL
-          value: "https://testforum.wetfish.net"
+          value: "https://wetfishonline.com"
         - name: SITE_COOKIE_NAME
           value: "SMFCookie"
