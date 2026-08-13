@@ -12,3 +12,9 @@ spec:
           value: "https://staging-forums.wetfish.net"
         - name: SITE_COOKIE_NAME
           value: "SMFStaging"
+        - name: SMF_CACHE_ENABLE
+          value: "1"
+        - name: SMF_CACHE_ACCELERATOR
+          value: "FileBased"
+        - name: DB_HOST
+          value: "10.43.2.248"
