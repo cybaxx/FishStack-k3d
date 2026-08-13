@@ -28,6 +28,17 @@ data:
             return 404;
         }
 
+        # Redirect legacy /forum/ URLs to forum root (migrated from /forum/ to /)
+        location = /forum {
+            return 301 https://$host/;
+        }
+        location ^~ /forum/ {
+            if ($request_uri ~ ^/forum/(.*)$) {
+                return 301 https://$host/$1;
+            }
+            return 301 https://$host/;
+        }
+
         # Persistent user content dirs — served directly from appdata PVC via alias
         # (avoids symlink complexity; appdata mounted at /var/www/appdata)
         location ^~ /Themes/ {

@@ -32,7 +32,7 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /var/www/forum
 
-# Copy SMF files from src/ (populated by CI from SimpleMachines/SMF v2.1.7 release)
+# Copy SMF files from src/ (populated by CI from SimpleMachines/SMF v2.1.6 release)
 # src/ is gitignored — the CI workflow downloads and prepares it automatically
 COPY src/ .
 

@@ -3,15 +3,15 @@ kind: Ingress
 metadata:
   name: forum-ingress
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+    cert-manager.io/cluster-issuer: wetfish-letsencrypt
+    traefik.ingress.kubernetes.io/router.tls: "true"
 spec:
-  ingressClassName: traefik
   tls:
   - hosts:
-    - forum.wetfish.net
+    - testforum.wetfish.net
+    secretName: forum-tls
   rules:
-  - host: forum.wetfish.net
+  - host: testforum.wetfish.net
     http:
       paths:
       - path: /

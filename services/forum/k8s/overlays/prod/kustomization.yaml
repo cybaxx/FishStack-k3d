@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: wetfish-prod
 resources:
   - ../../base
+  - secret.yaml
 images:
   - name: FORUM_NGINX_IMAGE
     newName: ghcr.io/cybaxx/web-services-k8s/forum
