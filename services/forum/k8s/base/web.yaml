@@ -139,6 +139,19 @@ spec:
           value: "FileBased"
         - name: SMF_CACHE_DIR
           value: "/var/www/forum/cache"
+        - name: SMF_SMTP_HOST
+          value: "smtp-relay.brevo.com"
+        - name: SMF_SMTP_PORT
+          value: "587"
+        - name: SMF_SMTP_USERNAME
+          value: "9e2063001@smtp-brevo.com"
+        - name: SMF_SMTP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: forum-app-secret
+              key: smtp-password
+        - name: SMF_MAIL_TYPE
+          value: "1"
         resources:
           requests:
             memory: "256Mi"
