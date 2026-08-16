@@ -1,40 +1,33 @@
 # Wetfish Web-Services K8s
 
-Kubernetes migration of wetfish web-services with observability stack (Prometheus, Grafana, Loki, Tempo).
+Kubernetes migration of wetfish web-services, running on k3d (local dev) and k3s (staging/production), with multi-environment Kustomize overlays and FluxCD GitOps for staging/prod.
 
 ---
 
-## Architecture
+## Environments
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                      k3d Cluster                            │
-├─────────────────────────────────────────────────────────────┤
-│  wetfish-system    │  wetfish-dev      │ wetfish-monitoring │
-│  (Traefik)         │  (Services)       │  (Observability)   │
-│                    │  ├─ Wiki          │  ├─ Prometheus     │
-│                    │  ├─ Home          │  ├─ Grafana        │
-│                    │  ├─ Glitch        │  ├─ Loki           │
-│                    │  ├─ Click         │  ├─ Tempo          │
-│                    │  ├─ Danger        │  └─ AlertManager   │
-│                    │  └─ Forum         │                    │
-└─────────────────────────────────────────────────────────────┘
-```
+| Environment | Namespace | Hostnames | Registry | Branch |
+|-------------|-----------|-----------|----------|--------|
+| dev | `wetfish-dev` | `*.wetfish.local` | `wetfish-registry:5000` (k3d local) | local builds |
+| staging | `wetfish-staging` | `staging-<svc>.wetfish.net` | `ghcr.io/cybaxx/web-services-k8s` | `main` |
+| prod | `wetfish-prod` | `<svc>.wetfish.net` | `ghcr.io/cybaxx/web-services-k8s` | `release` |
 
 ### Services
 
-| Service | Stack | Database | Status |
-|---------|-------|----------|--------|
-| **wiki** | PHP 8.2 + nginx (sidecar) | MariaDB 10.10 | Running |
-| **home** | SvelteKit (static nginx) | None | Running |
-| **glitch** | PHP 5.6 + nginx (sidecar) | None | Running |
-| **click** | PHP 5.6 + nginx (sidecar) | MariaDB 10.10 | Running |
-| **danger** | PHP 5.6 + nginx (sidecar) | MariaDB 10.10 | Running |
-| **forum** | SMF 2.1.6 + PHP 8.4 | MariaDB 10.11 | In Progress (dev) |
+| Service | Stack | Database |
+|---------|-------|----------|
+| **wiki** | PHP 8.2 + nginx (sidecar) | MariaDB 10.10 |
+| **home** | Node 20 build → nginx (static) | None |
+| **glitch** | PHP 5.6 + nginx (sidecar) | None |
+| **click** | PHP 5.6 + nginx (sidecar) | MariaDB 10.10 |
+| **danger** | PHP 5.6 + nginx (sidecar) | MariaDB 10.10 |
+| **forum** | SMF 2.1.6 + PHP 8.4 | MariaDB 10.11 |
+
+Observability is handled by [FishVision](https://github.com/wetfish/FishVision) (separate repo) — this repo no longer contains a monitoring stack.
 
 ---
 
-## Quick Start
+## Quick Start (dev)
 
 ### Prerequisites
 - Docker Desktop or Docker Engine
@@ -42,61 +35,28 @@ Kubernetes migration of wetfish web-services with observability stack (Prometheu
 - kubectl
 - helm
 
-### 1. Setup Development Environment
+### 1. Clone and bring up
 ```bash
-git clone git@github.com:cybaxx/web-services-k8s.git
-cd web-services-k8s
+git clone --recurse-submodules git@github.com:cybaxx/FishStack-k3d.git
+cd FishStack-k3d
 
-# Create k3d cluster with local registry
-./scripts/setup-dev.sh
+# Full bring-up: cluster + infra + builds + deploy + hosts
+./scripts/up.sh
 
-# Add DNS entries to /etc/hosts
+# Add DNS entries to /etc/hosts (if not done by up.sh)
 sudo ./scripts/setup-hosts.sh
 ```
 
-### 2. Build and Push Images
+`up.sh` creates a k3d cluster (1 server, 2 agents, local registry on `:5000`), deploys Traefik and cert-manager, builds and pushes all service images, and deploys every service to `wetfish-dev`. Use `--skip-cluster`, `--skip-build`, or `--skip-hosts` to reuse existing state.
+
+### 2. Load database schemas (first deploy only)
 ```bash
-# Wiki (PHP 8.2)
-docker build -t localhost:5000/wiki:nginx -f services/wiki/Dockerfile.nginx services/wiki/
-docker build -t localhost:5000/wiki:php -f services/wiki/Dockerfile.php services/wiki/
-docker push localhost:5000/wiki:nginx && docker push localhost:5000/wiki:php
-
-# Home (static SvelteKit)
-docker build -t localhost:5000/home:latest services/home/
-docker push localhost:5000/home:latest
-
-# Glitch (PHP 5.6)
-docker build -f services/glitch/Dockerfile.nginx -t localhost:5000/glitch:nginx services/glitch/
-docker build -f services/glitch/Dockerfile.php -t localhost:5000/glitch:php services/glitch/
-docker push localhost:5000/glitch:nginx && docker push localhost:5000/glitch:php
-
-# Click (PHP 5.6)
-docker build -f services/click/Dockerfile.nginx -t localhost:5000/click:nginx services/click/
-docker build -f services/click/Dockerfile.php -t localhost:5000/click:php services/click/
-docker push localhost:5000/click:nginx && docker push localhost:5000/click:php
-
-# Danger (PHP 5.6)
-docker build -f services/danger/Dockerfile.nginx -t localhost:5000/danger:nginx services/danger/
-docker build -f services/danger/Dockerfile.php -t localhost:5000/danger:php services/danger/
-docker push localhost:5000/danger:nginx && docker push localhost:5000/danger:php
+kubectl exec -i deployment/wiki-mysql -n wetfish-dev -- mysql -uroot -pwikipass wikidb < services/wiki/src/wwwroot/src/schema.sql
+kubectl exec -i deployment/click-mysql -n wetfish-dev -- mysql -uroot -pclickpass clickdb < services/click/src/schema.sql
+kubectl exec -i deployment/danger-mysql -n wetfish-dev -- mysql -uroot -pdangerpass dangerdb < services/danger/src/schema.sql
 ```
 
-### 3. Deploy Services
-```bash
-# Deploy all services
-./scripts/deploy.sh wetfish-dev wiki
-./scripts/deploy.sh wetfish-dev home
-./scripts/deploy.sh wetfish-dev glitch
-./scripts/deploy.sh wetfish-dev click
-./scripts/deploy.sh wetfish-dev danger
-
-# Load database schemas (first deploy only)
-kubectl exec -i deployment/wiki-mysql -n wetfish-dev -- mysql -uroot -pwikipass wikidb < services/wiki/config/schema.sql
-kubectl exec -i deployment/click-mysql -n wetfish-dev -- mysql -uroot -pclickpass clickdb < services/click/schema.sql
-kubectl exec -i deployment/danger-mysql -n wetfish-dev -- mysql -uroot -pdangerpass dangerdb < services/danger/schema.sql
-```
-
-### 4. Access Services
+### 3. Access services
 ```
 http://wiki.wetfish.local:8080
 http://home.wetfish.local:8080
@@ -107,38 +67,59 @@ http://danger.wetfish.local:8080
 
 ---
 
-## Development Commands
+## Scripts
 
-### Cluster Lifecycle
+| Script | Purpose |
+|--------|---------|
+| `up.sh` | Full bring-up (cluster + infra + builds + deploy + hosts) |
+| `setup-dev.sh` | Create the k3d cluster only |
+| `cleanup.sh` | Tear down cluster and Docker resources |
+| `setup-hosts.sh` | Manage `/etc/hosts` entries |
+| `deploy.sh` | Deploy a service to an environment |
+| `generate-secrets.sh` | Generate per-environment k8s secrets |
+| `bootstrap-flux.sh` | Bootstrap FluxCD on staging/prod |
+| `test-deployment.sh` | Run health checks against a deployment |
+| `test-setup.sh` | Validate cluster setup |
+| `fix-wiki.sh` | Wiki-specific repair tasks |
+| `sync-from-vultr.sh` | Sync data from the legacy Vultr host |
+
+### Cluster lifecycle
 ```bash
-./scripts/setup-dev.sh          # Create k3d cluster
-./scripts/cleanup.sh            # Tear down cluster
-sudo ./scripts/setup-hosts.sh   # Manage /etc/hosts entries
-k3d cluster start wetfish-dev   # Start existing cluster
-k3d cluster stop wetfish-dev    # Stop cluster
+./scripts/up.sh                          # Full bring-up
+./scripts/cleanup.sh                     # Tear down
+sudo ./scripts/setup-hosts.sh            # Manage DNS entries
+k3d cluster start wetfish-dev            # Start existing cluster
+k3d cluster stop wetfish-dev             # Stop cluster
 ```
 
 ### Deploying
 ```bash
-./scripts/deploy.sh <namespace> <service> [action]
-./scripts/deploy.sh wetfish-dev wiki              # Deploy wiki
-./scripts/deploy.sh wetfish-dev wiki delete        # Remove wiki
-./scripts/deploy.sh wetfish-monitoring monitoring  # Deploy monitoring (Helm)
-./scripts/deploy.sh wetfish-system traefik         # Deploy Traefik
+./scripts/deploy.sh [--env dev|staging|prod] <service> [delete]
+
+./scripts/deploy.sh wiki                 # Deploy wiki to dev (default)
+./scripts/deploy.sh --env staging wiki   # Deploy wiki to staging
+./scripts/deploy.sh --env prod wiki      # Deploy wiki to prod
+./scripts/deploy.sh --env dev wiki delete
+```
+
+### Secrets
+```bash
+./scripts/generate-secrets.sh                        # Dev secrets (default passwords)
+./scripts/generate-secrets.sh --random               # Dev secrets (random passwords)
+./scripts/generate-secrets.sh --env staging --random # Staging secrets
 ```
 
 ### Debugging
 ```bash
-# Health checks
 ./scripts/test-deployment.sh wetfish-dev wiki
 
-# Pods and logs (sidecar containers: nginx + php-fpm)
 kubectl get pods -n wetfish-dev
 kubectl logs deployment/wiki-web -n wetfish-dev -c nginx -f
 kubectl logs deployment/wiki-web -n wetfish-dev -c php-fpm -f
-
-# Shell access
 kubectl exec -it deployment/wiki-web -n wetfish-dev -c php-fpm -- bash
+
+# Preview a Kustomize overlay before applying
+kubectl kustomize services/wiki/k8s/overlays/dev/
 ```
 
 ---
@@ -146,32 +127,68 @@ kubectl exec -it deployment/wiki-web -n wetfish-dev -c php-fpm -- bash
 ## Project Structure
 
 ```
-web-services-k8s/
-├── .github/workflows/      # CI/CD pipelines (GitHub Actions)
-├── services/               # Application services
-│   ├── wiki/               # Wiki (PHP 8.2 custom app + MariaDB)
-│   ├── home/               # Home (SvelteKit static site)
-│   ├── glitch/             # Glitch (PHP 5.6 + Node 14)
-│   ├── click/              # Click (PHP 5.6 + MariaDB)
-│   └── danger/             # Danger (PHP 5.6 + MariaDB)
-├── infrastructure/         # Core infrastructure
-│   └── traefik/            # Traefik v2.11 ingress controller
-├── monitoring/             # Observability stack
-│   └── values/             # Helm values (Prometheus, Loki, Tempo)
-├── scripts/                # Automation scripts
-└── docs/                   # Documentation
+FishStack-k3d/
+├── .github/workflows/          # CI/CD pipelines (GitHub Actions)
+├── clusters/                   # FluxCD GitOps (staging + prod)
+│   ├── staging/                # apps/, infrastructure/, image-automation/
+│   └── prod/                   # apps/, infrastructure/
+├── services/                   # Application services
+│   ├── wiki/                   # PHP 8.2 + MariaDB
+│   ├── home/                   # Node 20 build → static nginx
+│   ├── glitch/                 # PHP 5.6
+│   ├── click/                  # PHP 5.6 + MariaDB
+│   ├── danger/                 # PHP 5.6 + MariaDB
+│   └── forum/                  # SMF 2.1.6 + MariaDB
+├── infrastructure/             # Core infrastructure
+│   ├── traefik/                # Traefik v2.11 ingress controller (raw manifests)
+│   ├── cert-manager/           # ACME issuers
+│   ├── network-policies/       # Network policy defaults
+│   ├── resource-limits/        # Default resource limits
+│   └── namespaces.yaml         # wetfish-system/dev/staging/prod
+├── scripts/                    # Automation scripts
+└── docs/                       # Documentation
 ```
 
-Each service has `k8s/` manifests (applied in numbered order), `Dockerfile.*` container definitions, and `config/` application configs.
+Each service lives under `services/<name>/` with:
+- `src/` — git submodule pointing at the upstream wetfish repo (application source)
+- `k8s/base/` — environment-agnostic manifests (configmap, mysql, web, ingress)
+- `k8s/overlays/{dev,staging,prod}/` — per-environment Kustomize overlays
+- `config/` — k8s-modified config files (nginx.conf, php.ini, Settings.php, etc.)
+- `Dockerfile.*` — container definitions (nginx / php-fpm sidecars)
+
+Base manifests use placeholder image names (e.g. `WIKI_NGINX_IMAGE:latest`) that Kustomize `images` transformers replace per environment. Overlays set namespace, registry, ingress hostnames, TLS, and env-specific values.
 
 ---
 
 ## CI/CD
 
-GitHub Actions workflows in `.github/workflows/` build container images to GHCR on push to main. Workflows trigger on changes to their respective `services/<name>/**` paths.
+GitHub Actions builds container images to GHCR on push. A reusable `build-service.yml` (`workflow_call`) handles checkout, GHCR login, metadata, and docker build+push; per-service workflows trigger on changes to their `services/<name>/**` paths:
+
+| Workflow | Service | Components |
+|----------|---------|------------|
+| `build-wiki.yml` | wiki | nginx, php |
+| `build-home.yml` | home | app |
+| `build-glitch.yml` | glitch | nginx, php |
+| `build-click.yml` | click | nginx, php |
+| `build-danger.yml` | danger | nginx, php |
+| `build-forum.yml` | forum | nginx, php |
+
+Image tags: `staging-<component>` on push to `main`, `prod-<component>` on push to `release`, plus branch/sha/pr tags.
 
 ```
-feature/branch -> PR -> main
+feature/branch -> PR -> main -> (merge to release for prod)
+```
+
+---
+
+## GitOps
+
+Staging and production are managed with FluxCD. The `clusters/` directory contains the Flux configuration (`apps/`, `infrastructure/`, and `image-automation/`) for each environment.
+
+```bash
+export GITHUB_TOKEN=...
+./scripts/bootstrap-flux.sh staging
+./scripts/bootstrap-flux.sh prod
 ```
 
 ---
@@ -183,15 +200,16 @@ feature/branch -> PR -> main
 - [x] Wiki service (pilot migration)
 - [x] Home, glitch, click, danger services
 - [x] CI/CD workflows
-- [x] Monitoring Helm values
+- [x] Multi-environment support (dev/staging/prod overlays)
 
-### Phase 2: Production Ready
-- [ ] Production cluster configuration
+### Phase 2: Production Ready (in progress)
+- [x] Forum service (SMF 2.1.6, live at `wetfishonline.com`)
+- [~] FluxCD GitOps (scaffolded in `clusters/` + `bootstrap-flux.sh`, not yet live)
 - [ ] Security hardening (see `docs/security-audit-action-items.md`)
-- [ ] Backup strategies
-- [ ] TLS/HTTPS enforcement
+- [ ] Backup strategies (manual mysqldump only)
+- [ ] TLS/HTTPS enforcement (cert-manager deployed; forced HTTP→HTTPS redirect pending)
 
 ### Phase 3: Scale Out
-- [ ] Forum service (SMF 2.1.6)
-- [ ] Multi-environment support
-- [ ] GitOps (ArgoCD)
+- [ ] FluxCD rollout to staging/prod (replace manual `kubectl` deploy)
+- [ ] Sealed secrets / external secret store
+- [ ] Automated promotion to production

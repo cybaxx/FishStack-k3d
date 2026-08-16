@@ -1,162 +1,181 @@
-# 🔄 Migration Strategy
+# Migration Strategy
 
 > Step-by-step migration plan from Docker Compose to Kubernetes for wetfish web-services.
 
 ---
 
-## 📋 Migration Overview
+## Migration Overview
 
-### **Current State: Docker Compose**
+### Original State: Docker Compose (legacy Vultr host)
+
 ```
-Docker Host
+Docker Host (149.28.239.165, now decommissioned — rollback only)
 ├── Traefik (reverse proxy)
-├── Wiki (Custom PHP + MariaDB)
-├── Forum (Node.js + PostgreSQL)
+├── Wiki (custom PHP + MariaDB)
+├── Forum (SMF PHP + MariaDB)
 ├── Home (static site)
 ├── Danger (JavaScript sandbox)
+├── Glitch (PHP)
 └── Click (tracking service)
 ```
 
-### **Target State: Kubernetes**
+### Target State: Kubernetes
+
 ```
-k3d Cluster
-├── wetfish-system (Traefik + infrastructure)
-├── wetfish-monitoring (observability stack)
-├── wetfish-dev (applications)
-└── wetfish-staging (testing)
+k3d (dev) / k3s (staging, prod)
+├── wetfish-system      (Traefik, cert-manager, infra)
+├── wetfish-dev         (applications — local k3d)
+├── wetfish-staging     (applications — staging)
+└── wetfish-prod        (applications — production)
 ```
+
+> **Observability** is handled by [FishVision](https://github.com/wetfish/FishVision) (a separate repo). This repo no longer ships a monitoring stack — Traefik exposes metrics at `:8082/metrics`, which FishVision's Prometheus scrapes.
 
 ---
 
-## 🎯 Migration Phases
+## Migration Phases
 
-### **Phase 0: Preparation** ✅
+### Phase 0: Preparation ✅
+
 **Goal**: Set up development environment and tools
 
-#### **Tasks**
+#### Tasks
 - [x] Install k3d and configure development cluster
 - [x] Set up local container registry (k3d registry on :5000)
 - [x] Create Kubernetes manifests structure
-- [x] Set up monitoring stack values (Prometheus + Grafana Helm values)
 - [x] Document all current service configurations
 
-#### **Deliverables**
+#### Deliverables
 - Functional k3d cluster (1 server, 2 agents)
-- Monitoring Helm values in `monitoring/values/`
 - Service manifest structure (`services/<name>/k8s/`)
 - Setup and deployment scripts
 
+> Originally included a `monitoring/` Helm values directory; this was removed when FishVision became the source of truth.
+
 ---
 
-### **Phase 1: Pilot Service - Wiki** ✅
+### Phase 1: Pilot Service - Wiki ✅
+
 **Goal**: Successfully migrate one service end-to-end
 
-#### **Tasks**
+#### Tasks
 - [x] Analyze current Docker Compose wiki configuration
 - [x] Containerize wiki (custom PHP app, NOT MediaWiki)
 - [x] Create Kubernetes manifests (sidecar pattern: nginx + php-fpm)
 - [x] Set up MariaDB 10.10 with persistent storage
-- [x] Configure ServiceMonitor for metrics
 - [x] Validate service functionality via Traefik ingress
 
-#### **Deliverables**
+#### Deliverables
 - Wiki service running at `wiki.wetfish.local:8080`
 - GitHub Actions CI/CD workflows for wiki images
 - Sidecar pattern established as template for PHP services
 
 ---
 
-### **Phase 2: Remaining Services** ✅
+### Phase 2: Remaining Services ✅
+
 **Goal**: Migrate home, glitch, click, and danger
 
-#### **Tasks**
-- [x] Home: SvelteKit static site (single nginx container)
+#### Tasks
+- [x] Home: Node 20 build → static nginx site
 - [x] Glitch: PHP 5.6 + nginx sidecar (no database)
 - [x] Click: PHP 5.6 + nginx sidecar + MariaDB 10.10
 - [x] Danger: PHP 5.6 + nginx sidecar + MariaDB 10.10
 - [x] Update setup-hosts.sh with new service DNS entries
 - [x] Update all documentation
 
-#### **Deliverables**
+#### Deliverables
 - 5 services running in k3d cluster
 - All services accessible via Traefik ingress
 - PHP 5.6 services using `php:5.6-fpm-alpine` base image
 
-#### **Key Decisions**
+#### Key Decisions
 - Used `php:5.6-fpm-alpine` instead of broken Sury PHP 5.6 repos
 - MariaDB configs require explicit `collation-server` matching `character-set-server`
-- Forum (SMF 2.1.6) deferred due to complexity
+- Forum (SMF 2.1.6) was initially deferred due to complexity, then delivered in Phase 3
 
 ---
 
-### **Phase 3: Forum Service** (deferred)
+### Phase 3: Forum Service ✅
+
 **Goal**: Migrate SMF 2.1.6 forum
 
-#### **Tasks**
-- [ ] Analyze SMF 2.1.6 build chain (PHP 8.4, composer, custom mods)
-- [ ] Create Dockerfiles for forum
-- [ ] Create Kubernetes manifests
-- [ ] Set up MariaDB with forum schema
-- [ ] Validate forum functionality
+#### Tasks
+- [x] Analyze SMF 2.1.6 build chain (PHP 8.4, custom mods)
+- [x] Create Dockerfiles (`Dockerfile.php`, `Dockerfile.nginx`)
+- [x] Create Kubernetes manifests (base + dev/staging/prod overlays)
+- [x] Set up MariaDB 10.11 with forum schema
+- [x] Validate forum functionality
+- [x] Bundle fish avatar + wf-item-econ assets into image
+- [x] Serve appdata dirs via nginx alias (avoids symlink complexity)
+- [x] CI workflow (`build-forum.yml`) builds from SMF source in CI
+
+#### Deliverables
+- SMF 2.1.6 forum with PHP 8.4 + nginx sidecar
+- Staging (`testforum.wetfish.net`) and prod overlays
+- SMF cache env vars (`FileBased` accelerator) + SMTP env vars via MailVars mod
+- Live at `wetfishonline.com` (deployed Aug 13 2026)
 
 ---
 
-### **Phase 4: CI/CD and Multi-Environment** ✅
+### Phase 4: CI/CD and Multi-Environment ✅
+
 **Goal**: Full CI/CD pipeline and multi-environment support
 
-#### **Tasks**
+#### Tasks
 - [x] Restructure manifests into Kustomize base + overlays (dev/staging/prod)
-- [x] Add GitHub Actions workflows for all 5 services (reusable workflow pattern)
+- [x] Add GitHub Actions workflows for all 6 services (reusable workflow pattern)
 - [x] Add wetfish-staging and wetfish-prod namespaces
 - [x] Update deploy.sh with `--env` flag and Kustomize overlay support
 - [x] Update generate-secrets.sh for per-environment secret generation
 - [x] Create `up.sh` single bring-up script for full dev stack
-- [x] Deploy monitoring stack (Prometheus, Grafana, Loki, Tempo, Promtail)
 
-#### **Deliverables**
-- Kustomize overlays for all 5 services x 3 environments (15 overlays)
-- Reusable CI workflow (`.github/workflows/build-service.yml`) + 5 trigger workflows
+#### Deliverables
+- Kustomize overlays for 6 services × 3 environments (18 overlays)
+- Reusable CI workflow (`.github/workflows/build-service.yml`) + 6 trigger workflows
 - `scripts/up.sh` for one-command dev stack bring-up
-- Full observability stack in `wetfish-monitoring` namespace
 
 ---
 
-### **Phase 5: Production Ready**
+### Phase 5: Production Ready (in progress)
+
 **Goal**: Security hardening, backups, production cluster
 
-#### **Tasks**
+#### Tasks
 - [ ] Address security audit findings (see `docs/security-audit-action-items.md`)
-- [ ] Implement TLS/HTTPS enforcement
+- [ ] Implement TLS/HTTPS enforcement (cert-manager deployed; forced HTTP→HTTPS redirect pending)
 - [ ] Replace hardcoded secrets with sealed secrets or external secret store
-- [ ] Add network policies
-- [ ] Add security contexts to all deployments
-- [ ] Implement backup and restore procedures
-- [ ] Deploy to staging environment and validate
+- [~] Add network policies (dev only — `infrastructure/network-policies/wetfish-dev.yaml`)
+- [ ] Add security contexts to deployments (services currently run as root)
+- [ ] Implement backup and restore procedures (manual mysqldump only)
+- [x] Deploy to staging environment and validate
 
 ---
 
-### **Phase 6: Forum and GitOps**
-**Goal**: Forum migration and GitOps automation
+### Phase 6: GitOps (in progress)
 
-#### **Tasks**
-- [ ] Migrate SMF 2.1.6 forum service
-- [ ] Set up GitOps with ArgoCD
-- [ ] Configure automated promotion to production
+**Goal**: GitOps automation
+
+#### Tasks
+- [x] Migrate SMF 2.1.6 forum service (delivered in Phase 3)
+- [~] FluxCD scaffolding (`clusters/` + `scripts/bootstrap-flux.sh`)
+- [ ] FluxCD rollout live (currently staging/prod managed by manual `kubectl`)
+- [ ] Automated promotion to production
 
 ---
 
-## 🔧 Service Migration Details
+## Service Migration Details
 
-### **Wiki Service Migration**
+### Wiki Service Migration
 
-#### **Current Architecture**
+#### Original Architecture
 ```yaml
 Docker Compose:
   wiki-web:
     image: wiki:latest
     ports: ["8080:80"]
     volumes: ["./data:/var/www/html"]
-  
+
   wiki-db:
     image: mariadb:10.10
     environment:
@@ -166,7 +185,7 @@ Docker Compose:
     volumes: ["./db:/var/lib/mysql"]
 ```
 
-#### **Target Architecture**
+#### Target Architecture
 ```yaml
 Kubernetes:
   - Namespace: wetfish-dev
@@ -181,12 +200,12 @@ Kubernetes:
   - PVC: wiki-mysql-data (2Gi)
 ```
 
-#### **Migration Steps**
+#### Migration Steps
 1. **Data Analysis**
    ```bash
    # Export current data
    docker exec wiki-db mysqldump -u root -p wiki > wiki-backup.sql
-   
+
    # Analyze file structure
    docker exec wiki-web find /var/www/html -type f | head -20
    ```
@@ -195,7 +214,7 @@ Kubernetes:
    ```bash
    # Build custom wiki image
    docker build -t wetfish/wiki:k8s-v1 services/wiki/
-   
+
    # Tag for local registry
    docker tag wetfish/wiki:k8s-v1 localhost:5000/wetfish/wiki:k8s-v1
    docker push localhost:5000/wetfish/wiki:k8s-v1
@@ -204,70 +223,57 @@ Kubernetes:
 3. **Kubernetes Deployment**
    ```bash
    # Deploy database first
-   kubectl apply -f services/wiki/kubernetes/01-database.yaml
-   
-   # Wait for database
-   kubectl wait --for=condition=ready pod -l app=wiki-db -n wetfish-dev
-   
-   # Migrate data
-   kubectl cp wiki-backup.sql wiki-db-pod:/tmp/wiki-backup.sql
-   kubectl exec wiki-db-pod -- mysql -u root -p wiki < /tmp/wiki-backup.sql
-   
-   # Deploy application
-   kubectl apply -f services/wiki/kubernetes/02-application.yaml
-   
-   # Configure ingress
-   kubectl apply -f services/wiki/kubernetes/03-ingress.yaml
+   kubectl apply -k services/wiki/k8s/overlays/dev/
+
+   # Load schema on first deploy
+   kubectl exec -i deployment/wiki-mysql -n wetfish-dev -- \
+     mysql -uroot -pwikipass wikidb < services/wiki/src/wwwroot/src/schema.sql
    ```
 
----
+### Forum Service Migration ✅
 
-### **Forum Service Migration** (deferred)
-
-#### **Target Architecture**
-- SMF 2.1.6 (Simple Machines Forum) - PHP 8.4 application
-- MariaDB database backend
+#### Target Architecture
+- SMF 2.1.6 (Simple Machines Forum) — PHP 8.4 application
+- MariaDB 10.11 backend
 - nginx + php-fpm sidecar pattern (same as other PHP services)
+- Appdata dirs (Themes, Packages, etc.) served via nginx alias, sourced from PVC
 
-#### **Migration Considerations**
-- Complex build chain (composer, custom SMF mods)
-- PHP 8.4 requirement (newer than other services)
-- Large existing database with user data
-- Session storage and attachment handling
+#### Migration Notes
+- Complex build chain (composer, custom SMF mods); CI downloads SMF 2.1.6 source and builds from it
+- Fish avatar + wf-item-econ assets bundled directly into the image
+- `Settings.php` cache config driven by env vars (`SMF_CACHE_ENABLE`, `SMF_CACHE_ACCELERATOR=FileBased`, `SMF_CACHE_DIR`)
+- SMTP driven by the MailVars mod env vars (`SMF_MAIL_TYPE`, `SMF_SMTP_HOST`, etc.)
+- Database migration handled by Firedoll's SQL pipeline (see `docs/forum-deployment-runbook.md`)
 
----
+### Static Sites (Home) Migration
 
-### **Static Sites (Home) Migration**
+Home is a SvelteKit app built in a Node 20 builder stage, with the resulting static output served by nginx:
 
-#### **Migration Strategy**
 ```yaml
-Options:
-  1. Static pod with hostPath volume
-  2. Nginx container with ConfigMap
-  3. External CDN integration
+Approach:
+  1. Build: node:20 builder -> npm install + npm run build
+  2. Serve: nginx:1.25-alpine serving the built public_html
 
-Recommended: Nginx container with ConfigMap
 Benefits:
-  - Containerized and versioned
-  - Easy updates via ConfigMap
-  - Can be served by Traefik
-  - Consistent with other services
+  - Immutable, versioned container image
+  - Consistent with other services' nginx serving
+  - Routed by Traefik ingress
 ```
 
 ---
 
-## 🔄 Data Migration Strategy
+## Data Migration Strategy
 
-### **Database Migration Process**
+### Database Migration Process
 
-#### **General Approach**
+#### General Approach
 1. **Export** data from running containers
 2. **Backup** entire data directory
 3. **Import** into Kubernetes pods
 4. **Validate** data integrity
 5. **Switch** traffic to new deployment
 
-#### **Migration Scripts**
+#### Migration Script
 ```bash
 #!/bin/bash
 # migrate-wiki-db.sh
@@ -275,7 +281,6 @@ Benefits:
 set -euo pipefail
 
 NAMESPACE="wetfish-dev"
-DB_POD="wiki-db-0"
 BACKUP_FILE="wiki-backup-$(date +%Y%m%d).sql"
 
 echo "Starting wiki database migration..."
@@ -284,25 +289,22 @@ echo "Starting wiki database migration..."
 echo "Exporting data from Docker Compose..."
 docker-compose exec -T wiki-db mysqldump -u root -p"$WIKI_ROOT_PASSWORD" wiki > "$BACKUP_FILE"
 
-# 2. Copy to Kubernetes pod
-echo "Copying backup to Kubernetes pod..."
-kubectl cp "$BACKUP_FILE" "$NAMESPACE/$DB_POD:/tmp/wiki-backup.sql"
-
-# 3. Import into Kubernetes database
+# 2. Import into Kubernetes database
 echo "Importing data into Kubernetes database..."
-kubectl exec "$NAMESPACE/$DB_POD" -- mysql -u root -p"$WIKI_ROOT_PASSWORD" wiki < /tmp/wiki-backup.sql
+kubectl exec -i deployment/wiki-mysql -n "$NAMESPACE" -- \
+  mysql -u root -p"$WIKI_ROOT_PASSWORD" wikidb < "$BACKUP_FILE"
 
-# 4. Validate
+# 3. Validate
 echo "Validating data migration..."
-RECORDS=$(kubectl exec "$NAMESPACE/$DB_POD" -- mysql -u root -p"$WIKI_ROOT_PASSWORD" -e "SELECT COUNT(*) FROM page;" wiki | tail -1)
-echo "Migrated $RECORDS pages"
+kubectl exec -i deployment/wiki-mysql -n "$NAMESPACE" -- \
+  mysql -u root -p"$WIKI_ROOT_PASSWORD" -e "SELECT COUNT(*) FROM page;" wikidb
 
 echo "Wiki database migration completed!"
 ```
 
-### **File Storage Migration**
+### File Storage Migration
 
-#### **Wiki File Migration**
+#### Wiki File Migration
 ```bash
 #!/bin/bash
 # migrate-wiki-files.sh
@@ -324,11 +326,11 @@ echo "Wiki files migration completed!"
 
 ---
 
-## 🧪 Testing Strategy
+## Testing Strategy
 
-### **Migration Testing Phases**
+### Migration Testing Phases
 
-#### **Phase 1: Unit Testing**
+#### Phase 1: Unit Testing
 ```yaml
 Tests:
   - Container builds successfully
@@ -337,7 +339,7 @@ Tests:
   - Configuration loading works
 ```
 
-#### **Phase 2: Integration Testing**
+#### Phase 2: Integration Testing
 ```yaml
 Tests:
   - Service startup and health checks
@@ -346,7 +348,7 @@ Tests:
   - Ingress routing
 ```
 
-#### **Phase 3: End-to-End Testing**
+#### Phase 3: End-to-End Testing
 ```yaml
 Tests:
   - Full user workflows
@@ -355,7 +357,7 @@ Tests:
   - Performance benchmarks
 ```
 
-#### **Phase 4: Load Testing**
+#### Phase 4: Load Testing
 ```yaml
 Tests:
   - Concurrent user scenarios
@@ -364,7 +366,7 @@ Tests:
   - Memory leak detection
 ```
 
-### **Test Automation**
+### Test Automation
 ```bash
 #!/bin/bash
 # test-migration.sh
@@ -379,59 +381,56 @@ echo "Running migration tests..."
 kubectl wait --for=condition=ready pod -l app=wiki -n $NAMESPACE --timeout=300s
 
 # 2. Test database connectivity
-kubectl exec deployment/wiki -n $NAMESPACE -- php -r "
-\$pdo = new PDO('mysql:host=wiki-db-service;dbname=wiki', 'wiki', '\$WIKI_PASSWORD');
-\$stmt = \$pdo->query('SELECT COUNT(*) FROM page');
-echo 'Database connection successful: ' . \$stmt->fetchColumn() . ' pages found';
+kubectl exec deployment/wiki-web -n $NAMESPACE -c php-fpm -- php -r "
+\$pdo = new PDO('mysql:host=wiki-mysql;dbname=wikidb', 'root', 'wikipass');
+echo 'Database connection successful';
 "
 
 # 3. Test web interface
-curl -f http://wiki.wetfish.local/wiki/Main_Page > /dev/null
+curl -f http://wiki.wetfish.local:8080/ > /dev/null
 echo "Web interface accessible"
-
-# 4. Test file uploads
-# TODO: Implement file upload test
 
 echo "All tests passed!"
 ```
 
 ---
 
-## 📋 Migration Checklist
+## Migration Checklist
 
-### **Pre-Migration**
+### Pre-Migration
 - [x] Current system documentation complete
 - [ ] Backup strategy validated
 - [x] Test environment ready
 - [x] Migration scripts written and tested
 - [x] Rollback plan documented
 
-### **Migration Execution**
+### Migration Execution
 - [x] Database schemas available (`schema.sql` for wiki, click, danger)
-- [x] Containers built and tested (all 5 services)
+- [x] Containers built and tested (all 6 services)
 - [x] Kubernetes manifests applied
 - [x] Services validated (HTTP 200 on all endpoints)
 
-### **Post-Migration**
+### Post-Migration
 - [x] Health checks passing (liveness/readiness probes on all pods)
-- [x] Monitoring stack deployed (Prometheus, Grafana, Loki, Tempo, Promtail)
-- [x] ServiceMonitors configured (wiki-web, wiki-mysql)
-- [x] Promtail shipping container logs from all nodes to Loki
-- [ ] Custom alert rules active
+- [x] Observability via FishVision (Traefik metrics scraped by FishVision Prometheus)
 - [x] Documentation updated
-- [ ] Old Docker Compose system decommissioned
+- [x] Old Docker Compose system decommissioned (149.28.239.165 is rollback-only)
+- [ ] Custom alert rules active
+- [ ] Backup procedures automated
 
 ---
 
-## 🚨 Rollback Strategy
+## Rollback Strategy
 
-### **Rollback Triggers**
+> The legacy Docker Compose host (149.28.239.165) has been decommissioned and is retained only for rollback. See `SIA/AGENTS.md` for current rollback details.
+
+### Rollback Triggers
 - Service health checks failing
 - Database corruption detected
 - Performance degradation >50%
 - Security issues identified
 
-### **Rollback Procedure**
+### Rollback Procedure
 ```bash
 #!/bin/bash
 # rollback.sh
@@ -440,105 +439,103 @@ set -euo pipefail
 
 echo "Starting rollback procedure..."
 
-# 1. Stop Kubernetes services
+# 1. Scale down Kubernetes services
 kubectl scale deployment wiki-web --replicas=0 -n wetfish-dev
 
-# 2. Start Docker Compose services
-cd /path/to/docker-compose
-docker-compose up -d
+# 2. Restore from backup (if restoring data)
+kubectl exec -i deployment/wiki-mysql -n wetfish-dev -- \
+  mysql -u root -p"$WIKI_ROOT_PASSWORD" wikidb < wiki-backup.sql
 
-# 3. Verify services are running
-docker-compose ps
+# 3. Scale back up
+kubectl scale deployment wiki-web --replicas=1 -n wetfish-dev
 
 echo "Rollback completed!"
 ```
 
-### **Rollback Validation**
-- [x] Docker Compose configs still available in original `web-services` repo
-- [ ] Data integrity verified
-- [ ] User access restored
-- [ ] Monitoring alerts resolved
-
 ---
 
-## 📊 Migration Timeline
+## Migration Timeline
 
 ```mermaid
 gantt
     title Migration Timeline
     dateFormat  YYYY-MM-DD
     section Phase 0
-    Preparation          :done, 2024-02-12, 7d
+    Preparation          :done, 2026-02-12, 7d
     section Phase 1
-    Wiki Migration       :done, 2024-02-19, 14d
+    Wiki Migration       :done, 2026-02-19, 14d
     section Phase 2
-    Remaining Services   :done, 2024-03-04, 14d
+    Remaining Services   :done, 2026-03-04, 14d
     section Phase 3
-    Forum Service        :2024-03-18, 14d
+    Forum Service        :done, 2026-06-01, 30d
     section Phase 4
-    Production Ready     :2024-04-01, 14d
+    CI/CD & Multi-Env    :done, 2026-06-15, 14d
     section Phase 5
-    CI/CD & GitOps       :2024-04-15, 14d
+    Production Ready     :active, 2026-07-01, 30d
+    section Phase 6
+    GitOps (FluxCD)      :2026-08-01, 30d
 ```
 
 ---
 
-## 🎯 Success Criteria
+## Success Criteria
 
-### **Phase 0 Complete** ✅
+### Phase 0 Complete ✅
 - [x] k3d cluster running with Traefik ingress
 - [x] Local registry on port 5000
-- [x] Monitoring stack Helm values and deployment
 - [x] Setup, deploy, cleanup, hosts, and test scripts
 
-### **Phase 1 Complete** ✅
+### Phase 1 Complete ✅
 - [x] Wiki service fully functional in K8s (sidecar pattern)
 - [x] MariaDB with persistent storage
 - [x] GitHub Actions CI/CD workflows
-- [x] ServiceMonitor for Prometheus
 
-### **Phase 2 Complete** ✅
+### Phase 2 Complete ✅
 - [x] Home, glitch, click, danger services migrated
 - [x] All services accessible via Traefik ingress
 - [x] Documentation updated
 
-### **Phase 3: Forum** (not started)
-- [ ] SMF 2.1.6 forum service migrated
-- [ ] Forum database with schema loaded
+### Phase 3: Forum ✅
+- [x] SMF 2.1.6 forum service migrated
+- [x] Forum database with schema loaded
+- [x] Live at `wetfishonline.com`
 
-### **Phase 4: CI/CD & Multi-Environment** ✅
-- [x] Full CI/CD pipeline for all 5 services (reusable GitHub Actions workflow)
+### Phase 4: CI/CD & Multi-Environment ✅
+- [x] Full CI/CD pipeline for all 6 services (reusable GitHub Actions workflow)
 - [x] Multi-environment support (dev/staging/prod Kustomize overlays)
-- [x] Monitoring stack deployed (Prometheus, Grafana, Loki, Tempo, Promtail)
 - [x] One-command dev stack bring-up (`scripts/up.sh`)
 
-### **Phase 5: Production Ready** (not started)
+### Phase 5: Production Ready (in progress)
 - [ ] Security audit findings addressed
 - [ ] TLS/HTTPS enforced
 - [ ] Secrets management implemented
 - [ ] Backup procedures validated
 
-### **Phase 6: Forum & GitOps** (not started)
-- [ ] Forum service migrated
-- [ ] GitOps with ArgoCD
+### Phase 6: GitOps (in progress)
+- [~] FluxCD scaffolding (`clusters/` + `bootstrap-flux.sh`)
+- [ ] FluxCD live for staging/prod
+- [ ] Automated promotion to production
 
 ---
 
-## 🔧 Tools and Scripts
+## Tools and Scripts
 
-### **Migration Utilities**
-- `migrate-wiki-db.sh` - Database migration
-- `migrate-wiki-files.sh` - File storage migration
-- `test-migration.sh` - Automated testing
-- `rollback.sh` - Emergency rollback
-- `cleanup.sh` - Post-migration cleanup
+### Migration Utilities
+- `up.sh` — full dev stack bring-up
+- `deploy.sh` — per-environment service deployment
+- `generate-secrets.sh` — per-environment secret generation
+- `bootstrap-flux.sh` — FluxCD bootstrap for staging/prod
+- `cleanup.sh` — tear down dev cluster
+- `sync-from-vultr.sh` — sync data from legacy Vultr host
+- `test-deployment.sh` — health checks
 
-### **Monitoring Tools**
-- Prometheus metrics collection
+### Observability
+Handled by FishVision (separate repo):
+- Prometheus metrics (scrapes Traefik `:8082/metrics`)
 - Grafana dashboards
 - Loki log aggregation
 - Tempo distributed tracing
 
 ---
 
-*Migration Strategy v1.0 - Last Updated: $(date)*
+*Migration Strategy — last updated Aug 2026*
