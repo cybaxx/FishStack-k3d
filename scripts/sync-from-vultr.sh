@@ -4,12 +4,23 @@
 # Uploads: rsync straight into local-path PVC hostPath (incremental, no staging)
 set -euo pipefail
 
+# cron runs with a minimal PATH; kubectl lives outside /usr/bin
+export PATH="/usr/local/bin:/usr/bin:/bin:/opt/bin:$PATH"
+export KUBECONFIG="${KUBECONFIG:-/etc/rancher/k3s/k3s.yaml}"
+
 VULTR_HOST="root@149.28.239.165"
 VULTR_KEY="/root/.ssh/cyba_wetish"
 NAMESPACE="wetfish-prod"
-UPLOADS_PVC_PATH="/var/lib/rancher/k3s/storage/pvc-cba80cd4-f176-440b-a0fc-5e2350358add_wetfish-prod_wiki-uploads-pvc"
 
 log() { echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] $*"; }
+
+# Resolve the wiki-uploads PVC hostPath dynamically (was hardcoded to a stale path)
+uploads_pvc_path() {
+  local vol
+  vol=$(kubectl -n "$NAMESPACE" get pvc wiki-uploads-pvc -o jsonpath='{.spec.volumeName}' 2>/dev/null)
+  [ -n "$vol" ] || { log "ERROR: wiki-uploads-pvc not found"; exit 1; }
+  kubectl get pv "$vol" -o jsonpath='{.spec.local.path}'
+}
 
 # --- DB sync ---
 log "Starting wiki DB sync"
@@ -25,10 +36,12 @@ log "DB sync complete"
 
 # --- Uploads rsync ---
 log "Starting wiki uploads rsync"
+UPLOADS_PVC_PATH=$(uploads_pvc_path)
 
-rsync -az --delete --info=stats2 \
+# NOTE: --delete omitted — additive sync only, never removes data on the k3s side.
+rsync -az --info=stats2 \
   -e "ssh -i $VULTR_KEY -o StrictHostKeyChecking=no" \
-  "$VULTR_HOST:/opt/web-services/prod/services/wiki/upload/" \
+  "$VULTR_HOST:/mnt/wetfish/wiki/uploads/" \
   "$UPLOADS_PVC_PATH/"
 
 log "Uploads rsync complete"
