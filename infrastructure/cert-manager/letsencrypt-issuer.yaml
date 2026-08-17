@@ -9,6 +9,19 @@ spec:
     privateKeySecretRef:
       name: letsencrypt-account-key
     solvers:
-    - http01:
-        ingress:
-          ingressClassName: traefik
+    - dns01:
+        cloudflare:
+          apiTokenSecretRef:
+            name: cloudflare-api-token
+            key: api-token
+      selector:
+        dnsZones:
+        - wetfishonline.com
+    - dns01:
+        cloudflare:
+          apiTokenSecretRef:
+            name: cloudflare-api-token-wetfishnet
+            key: api-token
+      selector:
+        dnsZones:
+        - wetfish.net
