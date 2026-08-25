@@ -11,6 +11,10 @@ data:
         listen 80;
         server_name _;
 
+        # Restore real client IPs. Direct peer is Traefik (cluster CIDR); the
+        # CF-Connecting-IP header it forwards is only honored from trusted peers.
+        set_real_ip_from 10.42.0.0/16;
+        set_real_ip_from 10.43.0.0/16;
         # Restore real client IPs from Cloudflare (all traffic arrives proxied).
         # Without this, PHP sees rotating CF edge IPs — breaks SMF session IP
         # checks, bans, throttles, and pollutes logs/analytics.
