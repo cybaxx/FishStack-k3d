@@ -36,6 +36,8 @@ spec:
           - "--api.dashboard=true"
           - "--providers.kubernetesingress"
           - "--entrypoints.web.address=:80"
+          - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+          - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
           - "--entrypoints.websecure.address=:443"
           - "--entrypoints.traefik.address=:8080"
           - "--ping"
@@ -44,10 +46,6 @@ spec:
           - "--metrics.prometheus.entrypoint=metrics"
           - "--accesslog=true"
           - "--accesslog.format=json"
-          - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
-          - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
-          - "--certificatesresolvers.letsencrypt.acme.email=letsencrypt@wetfish.net"
-          - "--certificatesresolvers.letsencrypt.acme.storage=/acme/acme.json"
         ports:
         - name: web
           containerPort: 80
