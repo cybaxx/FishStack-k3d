@@ -1,0 +1,2288 @@
+[2026-08-17T06:00:43Z] Starting wiki DB sync
+[2026-08-17T06:01:09Z] DB sync complete
+[2026-08-17T06:01:09Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 38,340 (reg: 38,327, dir: 13)
+Number of deleted files: 0
+Number of regular files transferred: 38,327
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 20,954,188,399 bytes
+Literal data: 20,954,188,399 bytes
+Matched data: 0 bytes
+File list size: 2,161,554
+File list generation time: 22.875 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 728,380
+Total bytes received: 20,608,344,979
+
+sent 728,380 bytes  received 20,608,344,979 bytes  73,211,628.27 bytes/sec
+total size is 20,954,188,399  speedup is 1.02
+[2026-08-17T06:05:51Z] Uploads rsync complete
+[2026-08-17T06:05:51Z] Done
+[2026-08-17T07:00:01Z] Starting wiki DB sync
+[2026-08-17T07:00:27Z] DB sync complete
+[2026-08-17T07:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.630 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  288,202.67 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-17T07:00:34Z] Uploads rsync complete
+[2026-08-17T07:00:34Z] Done
+[2026-08-17T08:00:01Z] Starting wiki DB sync
+[2026-08-17T09:00:01Z] Starting wiki DB sync
+[2026-08-17T09:00:29Z] DB sync complete
+[2026-08-17T09:00:29Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.661 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  288,202.67 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-17T09:00:36Z] Uploads rsync complete
+[2026-08-17T09:00:36Z] Done
+[2026-08-17T10:00:01Z] Starting wiki DB sync
+[2026-08-17T10:00:27Z] DB sync complete
+[2026-08-17T10:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.497 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-17T10:00:34Z] Uploads rsync complete
+[2026-08-17T10:00:34Z] Done
+[2026-08-17T11:00:01Z] Starting wiki DB sync
+[2026-08-17T11:00:27Z] DB sync complete
+[2026-08-17T11:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.285 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-17T11:00:34Z] Uploads rsync complete
+[2026-08-17T11:00:34Z] Done
+[2026-08-17T12:00:01Z] Starting wiki DB sync
+error: Internal error occurred: context canceled
+[2026-08-17T13:00:01Z] Starting wiki DB sync
+[2026-08-17T13:00:27Z] DB sync complete
+[2026-08-17T13:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.211 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  288,202.67 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-17T13:00:34Z] Uploads rsync complete
+[2026-08-17T13:00:34Z] Done
+[2026-08-17T14:00:01Z] Starting wiki DB sync
+[2026-08-17T14:00:28Z] DB sync complete
+[2026-08-17T14:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.146 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-17T14:00:35Z] Uploads rsync complete
+[2026-08-17T14:00:35Z] Done
+[2026-08-17T15:00:01Z] Starting wiki DB sync
+[2026-08-17T15:00:26Z] DB sync complete
+[2026-08-17T15:00:26Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.262 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  288,202.67 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-17T15:00:33Z] Uploads rsync complete
+[2026-08-17T15:00:33Z] Done
+[2026-08-17T16:00:01Z] Starting wiki DB sync
+E0817 16:00:10.526162 1817904 v2.go:129] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0817 16:00:10.526216 1817904 v2.go:167] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0817 16:00:10.526236 1817904 v2.go:150] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+error: error reading from error stream: next reader: local error: tls: bad record MAC
+[2026-08-17T17:00:01Z] Starting wiki DB sync
+[2026-08-17T17:00:28Z] DB sync complete
+[2026-08-17T17:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.142 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-17T17:00:34Z] Uploads rsync complete
+[2026-08-17T17:00:34Z] Done
+[2026-08-17T18:00:01Z] Starting wiki DB sync
+[2026-08-17T18:00:32Z] DB sync complete
+[2026-08-17T18:00:32Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 22.747 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  36,949.06 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-17T18:01:31Z] Uploads rsync complete
+[2026-08-17T18:01:31Z] Done
+[2026-08-17T19:00:01Z] Starting wiki DB sync
+[2026-08-17T19:00:28Z] DB sync complete
+[2026-08-17T19:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.402 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  288,202.67 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-17T19:00:35Z] Uploads rsync complete
+[2026-08-17T19:00:35Z] Done
+[2026-08-17T20:00:01Z] Starting wiki DB sync
+E0817 20:00:09.748606 2098517 v2.go:167] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0817 20:00:09.748701 2098517 v2.go:129] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0817 20:00:09.749826 2098517 v2.go:150] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+error: error reading from error stream: next reader: local error: tls: bad record MAC
+[2026-08-17T21:00:01Z] Starting wiki DB sync
+[2026-08-17T21:00:26Z] DB sync complete
+[2026-08-17T21:00:26Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.414 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-17T21:00:33Z] Uploads rsync complete
+[2026-08-17T21:00:33Z] Done
+[2026-08-17T22:00:01Z] Starting wiki DB sync
+[2026-08-17T22:00:25Z] DB sync complete
+[2026-08-17T22:00:25Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.000 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-17T22:00:31Z] Uploads rsync complete
+[2026-08-17T22:00:31Z] Done
+[2026-08-17T23:00:01Z] Starting wiki DB sync
+[2026-08-17T23:00:27Z] DB sync complete
+[2026-08-17T23:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 1.865 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  393,003.64 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-17T23:00:33Z] Uploads rsync complete
+[2026-08-17T23:00:33Z] Done
+[2026-08-18T00:00:01Z] Starting wiki DB sync
+E0818 00:00:08.323202 2371965 v2.go:150] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0818 00:00:08.323257 2371965 v2.go:167] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0818 00:00:08.323277 2371965 v2.go:129] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+error: error reading from error stream: next reader: local error: tls: bad record MAC
+[2026-08-18T00:00:30Z] DB sync complete
+[2026-08-18T00:00:30Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 13.112 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  81,566.79 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-18T00:00:58Z] Uploads rsync complete
+[2026-08-18T00:00:58Z] Done
+[2026-08-18T01:00:01Z] Starting wiki DB sync
+[2026-08-18T01:00:29Z] DB sync complete
+[2026-08-18T01:00:29Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.187 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 42
+Total bytes received: 2,161,488
+
+sent 42 bytes  received 2,161,488 bytes  332,543.08 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.15
+[2026-08-18T01:00:35Z] Uploads rsync complete
+[2026-08-18T01:00:35Z] Done
+[2026-08-18T02:00:01Z] Starting wiki DB sync
+[2026-08-18T03:00:01Z] Starting wiki DB sync
+[2026-08-18T03:00:29Z] DB sync complete
+[2026-08-18T03:00:29Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.442 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-18T03:00:35Z] Uploads rsync complete
+[2026-08-18T03:00:35Z] Done
+[2026-08-18T04:00:01Z] Starting wiki DB sync
+[2026-08-18T04:00:27Z] DB sync complete
+[2026-08-18T04:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 1.990 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  393,003.64 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-18T04:00:32Z] Uploads rsync complete
+[2026-08-18T04:00:32Z] Done
+[2026-08-18T05:00:01Z] Starting wiki DB sync
+[2026-08-18T05:00:28Z] DB sync complete
+[2026-08-18T05:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 1.870 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  393,003.64 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-18T05:00:33Z] Uploads rsync complete
+[2026-08-18T05:00:33Z] Done
+[2026-08-18T06:00:01Z] Starting wiki DB sync
+E0818 06:00:08.823183 2782283 v2.go:167] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0818 06:00:08.823380 2782283 v2.go:129] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0818 06:00:08.823397 2782283 v2.go:150] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+error: error reading from error stream: next reader: local error: tls: bad record MAC
+[2026-08-18T06:00:30Z] DB sync complete
+[2026-08-18T06:00:30Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 22.539 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  39,660.92 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-18T06:01:26Z] Uploads rsync complete
+[2026-08-18T06:01:26Z] Done
+[2026-08-18T07:00:01Z] Starting wiki DB sync
+[2026-08-18T07:00:28Z] DB sync complete
+[2026-08-18T07:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.173 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-18T07:00:35Z] Uploads rsync complete
+[2026-08-18T07:00:35Z] Done
+[2026-08-18T08:00:01Z] Starting wiki DB sync
+[2026-08-18T09:00:01Z] Starting wiki DB sync
+[2026-08-18T09:00:27Z] DB sync complete
+[2026-08-18T09:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 1.917 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-18T09:00:33Z] Uploads rsync complete
+[2026-08-18T09:00:33Z] Done
+[2026-08-18T10:00:01Z] Starting wiki DB sync
+[2026-08-18T10:00:26Z] DB sync complete
+[2026-08-18T10:00:26Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.030 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  393,003.64 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-18T10:00:32Z] Uploads rsync complete
+[2026-08-18T10:00:32Z] Done
+[2026-08-18T11:00:01Z] Starting wiki DB sync
+[2026-08-18T11:00:27Z] DB sync complete
+[2026-08-18T11:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 1.983 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-18T11:00:33Z] Uploads rsync complete
+[2026-08-18T11:00:33Z] Done
+[2026-08-18T12:00:01Z] Starting wiki DB sync
+E0818 12:00:08.553270 3196534 v2.go:129] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0818 12:00:08.553001 3196534 v2.go:150] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0818 12:00:08.553442 3196534 v2.go:167] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+error: error reading from error stream: next reader: local error: tls: bad record MAC
+[2026-08-18T12:00:30Z] DB sync complete
+[2026-08-18T12:00:30Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 22.333 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  38,256.99 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-18T12:01:26Z] Uploads rsync complete
+[2026-08-18T12:01:26Z] Done
+[2026-08-18T13:00:01Z] Starting wiki DB sync
+[2026-08-18T13:00:29Z] DB sync complete
+[2026-08-18T13:00:29Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.506 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  288,202.67 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-18T13:00:36Z] Uploads rsync complete
+[2026-08-18T13:00:36Z] Done
+[2026-08-18T14:00:01Z] Starting wiki DB sync
+[2026-08-18T14:00:28Z] DB sync complete
+[2026-08-18T14:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.264 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  288,202.67 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-18T14:00:35Z] Uploads rsync complete
+[2026-08-18T14:00:35Z] Done
+[2026-08-18T15:00:01Z] Starting wiki DB sync
+[2026-08-18T16:00:01Z] Starting wiki DB sync
+[2026-08-18T16:00:27Z] DB sync complete
+[2026-08-18T16:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,474
+File list generation time: 2.495 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 44
+Total bytes received: 2,161,486
+
+sent 44 bytes  received 2,161,486 bytes  288,204.00 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.15
+[2026-08-18T16:00:34Z] Uploads rsync complete
+[2026-08-18T16:00:34Z] Done
+[2026-08-18T17:00:01Z] Starting wiki DB sync
+[2026-08-18T17:00:27Z] DB sync complete
+[2026-08-18T17:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.489 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  288,202.67 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-18T17:00:34Z] Uploads rsync complete
+[2026-08-18T17:00:34Z] Done
+[2026-08-18T18:00:01Z] Starting wiki DB sync
+[2026-08-18T18:00:30Z] DB sync complete
+[2026-08-18T18:00:30Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 22.888 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  35,146.67 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-18T18:01:31Z] Uploads rsync complete
+[2026-08-18T18:01:31Z] Done
+[2026-08-18T19:00:01Z] Starting wiki DB sync
+error: Internal error occurred: context canceled
+[2026-08-18T20:00:01Z] Starting wiki DB sync
+[2026-08-18T20:00:27Z] DB sync complete
+[2026-08-18T20:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,474
+File list generation time: 2.558 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 49
+Total bytes received: 2,161,491
+
+sent 49 bytes  received 2,161,491 bytes  288,205.33 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.10
+[2026-08-18T20:00:34Z] Uploads rsync complete
+[2026-08-18T20:00:34Z] Done
+[2026-08-18T21:00:01Z] Starting wiki DB sync
+[2026-08-18T21:00:28Z] DB sync complete
+[2026-08-18T21:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.022 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 42
+Total bytes received: 2,161,488
+
+sent 42 bytes  received 2,161,488 bytes  332,543.08 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.15
+[2026-08-18T21:00:35Z] Uploads rsync complete
+[2026-08-18T21:00:35Z] Done
+[2026-08-18T22:00:01Z] Starting wiki DB sync
+[2026-08-18T22:00:28Z] DB sync complete
+[2026-08-18T22:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.231 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-18T22:00:34Z] Uploads rsync complete
+[2026-08-18T22:00:34Z] Done
+[2026-08-18T23:00:01Z] Starting wiki DB sync
+error: Internal error occurred: context canceled
+[2026-08-19T00:00:01Z] Starting wiki DB sync
+[2026-08-19T00:00:31Z] DB sync complete
+[2026-08-19T00:00:31Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 23.164 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  36,949.06 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-19T00:01:30Z] Uploads rsync complete
+[2026-08-19T00:01:30Z] Done
+[2026-08-19T01:00:01Z] Starting wiki DB sync
+[2026-08-19T01:00:28Z] DB sync complete
+[2026-08-19T01:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.355 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-19T01:00:35Z] Uploads rsync complete
+[2026-08-19T01:00:35Z] Done
+[2026-08-19T02:00:01Z] Starting wiki DB sync
+[2026-08-19T02:00:26Z] DB sync complete
+[2026-08-19T02:00:26Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.367 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-19T02:00:33Z] Uploads rsync complete
+[2026-08-19T02:00:33Z] Done
+[2026-08-19T03:00:01Z] Starting wiki DB sync
+E0819 03:00:09.088639   31900 v2.go:167] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0819 03:00:09.088639   31900 v2.go:129] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0819 03:00:09.088752   31900 v2.go:150] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+error: error reading from error stream: next reader: local error: tls: bad record MAC
+[2026-08-19T03:00:29Z] DB sync complete
+[2026-08-19T03:00:29Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,474
+File list generation time: 2.001 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 44
+Total bytes received: 2,161,486
+
+sent 44 bytes  received 2,161,486 bytes  332,543.08 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.15
+[2026-08-19T03:00:35Z] Uploads rsync complete
+[2026-08-19T03:00:35Z] Done
+[2026-08-19T04:00:01Z] Starting wiki DB sync
+[2026-08-19T05:00:01Z] Starting wiki DB sync
+[2026-08-19T05:00:26Z] DB sync complete
+[2026-08-19T05:00:26Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.344 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-19T05:00:33Z] Uploads rsync complete
+[2026-08-19T05:00:33Z] Done
+[2026-08-19T06:00:01Z] Starting wiki DB sync
+[2026-08-19T06:00:29Z] DB sync complete
+[2026-08-19T06:00:29Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 22.083 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  39,660.92 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-19T06:01:24Z] Uploads rsync complete
+[2026-08-19T06:01:24Z] Done
+[2026-08-19T07:00:01Z] Starting wiki DB sync
+[2026-08-19T07:00:28Z] DB sync complete
+[2026-08-19T07:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.203 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-19T07:00:34Z] Uploads rsync complete
+[2026-08-19T07:00:35Z] Done
+[2026-08-19T08:00:01Z] Starting wiki DB sync
+error: Internal error occurred: context canceled
+[2026-08-19T08:00:28Z] DB sync complete
+[2026-08-19T08:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.099 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  393,003.64 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-19T08:00:34Z] Uploads rsync complete
+[2026-08-19T08:00:34Z] Done
+[2026-08-19T09:00:01Z] Starting wiki DB sync
+[2026-08-19T10:00:01Z] Starting wiki DB sync
+[2026-08-19T10:00:28Z] DB sync complete
+[2026-08-19T10:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.845 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  254,296.47 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-19T10:00:36Z] Uploads rsync complete
+[2026-08-19T10:00:36Z] Done
+[2026-08-19T11:00:01Z] Starting wiki DB sync
+[2026-08-19T11:00:26Z] DB sync complete
+[2026-08-19T11:00:26Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.683 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 42
+Total bytes received: 2,161,488
+
+sent 42 bytes  received 2,161,488 bytes  332,543.08 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.15
+[2026-08-19T11:00:34Z] Uploads rsync complete
+[2026-08-19T11:00:34Z] Done
+[2026-08-19T12:00:01Z] Starting wiki DB sync
+[2026-08-19T12:00:29Z] DB sync complete
+[2026-08-19T12:00:29Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,474
+File list generation time: 22.592 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 44
+Total bytes received: 2,161,486
+
+sent 44 bytes  received 2,161,486 bytes  38,946.49 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.15
+[2026-08-19T12:01:25Z] Uploads rsync complete
+[2026-08-19T12:01:25Z] Done
+[2026-08-19T13:00:01Z] Starting wiki DB sync
+E0819 13:00:07.205766  713372 v2.go:129] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0819 13:00:07.205539  713372 v2.go:167] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0819 13:00:07.211202  713372 v2.go:150] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+error: error reading from error stream: next reader: local error: tls: bad record MAC
+[2026-08-19T14:00:01Z] Starting wiki DB sync
+[2026-08-19T14:00:26Z] DB sync complete
+[2026-08-19T14:00:26Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.697 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  254,296.47 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-19T14:00:34Z] Uploads rsync complete
+[2026-08-19T14:00:34Z] Done
+[2026-08-19T15:00:01Z] Starting wiki DB sync
+[2026-08-19T15:00:26Z] DB sync complete
+[2026-08-19T15:00:26Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.840 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  288,202.67 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-19T15:00:33Z] Uploads rsync complete
+[2026-08-19T15:00:33Z] Done
+[2026-08-19T16:00:01Z] Starting wiki DB sync
+[2026-08-19T16:00:27Z] DB sync complete
+[2026-08-19T16:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.413 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-19T16:00:33Z] Uploads rsync complete
+[2026-08-19T16:00:33Z] Done
+[2026-08-19T17:00:01Z] Starting wiki DB sync
+error: Internal error occurred: context canceled
+[2026-08-19T17:00:27Z] DB sync complete
+[2026-08-19T17:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.119 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-19T17:00:33Z] Uploads rsync complete
+[2026-08-19T17:00:33Z] Done
+[2026-08-19T18:00:01Z] Starting wiki DB sync
+[2026-08-19T18:00:29Z] DB sync complete
+[2026-08-19T18:00:29Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 23.663 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  35,146.67 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-19T18:01:30Z] Uploads rsync complete
+[2026-08-19T18:01:30Z] Done
+[2026-08-19T19:00:01Z] Starting wiki DB sync
+[2026-08-19T20:00:01Z] Starting wiki DB sync
+[2026-08-19T20:00:28Z] DB sync complete
+[2026-08-19T20:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.142 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-19T20:00:34Z] Uploads rsync complete
+[2026-08-19T20:00:34Z] Done
+[2026-08-19T21:00:01Z] Starting wiki DB sync
+[2026-08-19T21:00:27Z] DB sync complete
+[2026-08-19T21:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.017 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  393,003.64 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-19T21:00:33Z] Uploads rsync complete
+[2026-08-19T21:00:33Z] Done
+[2026-08-19T22:00:02Z] Starting wiki DB sync
+[2026-08-19T22:00:27Z] DB sync complete
+[2026-08-19T22:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 1.955 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-19T22:00:33Z] Uploads rsync complete
+[2026-08-19T22:00:33Z] Done
+[2026-08-19T23:00:01Z] Starting wiki DB sync
+E0819 23:00:08.789375 1394875 v2.go:167] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0819 23:00:08.789411 1394875 v2.go:129] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0819 23:00:08.789446 1394875 v2.go:150] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+error: error reading from error stream: next reader: local error: tls: bad record MAC
+[2026-08-19T23:00:27Z] DB sync complete
+[2026-08-19T23:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.421 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-19T23:00:34Z] Uploads rsync complete
+[2026-08-19T23:00:34Z] Done
+[2026-08-20T00:00:01Z] Starting wiki DB sync
+[2026-08-20T00:00:32Z] DB sync complete
+[2026-08-20T00:00:32Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 21.114 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  40,402.24 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-20T00:01:25Z] Uploads rsync complete
+[2026-08-20T00:01:25Z] Done
+[2026-08-20T01:00:01Z] Starting wiki DB sync
+[2026-08-20T02:00:01Z] Starting wiki DB sync
+[2026-08-20T02:00:29Z] DB sync complete
+[2026-08-20T02:00:29Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.941 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-20T02:00:37Z] Uploads rsync complete
+[2026-08-20T02:00:37Z] Done
+[2026-08-20T03:00:01Z] Starting wiki DB sync
+[2026-08-20T03:00:28Z] DB sync complete
+[2026-08-20T03:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.067 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-20T03:00:34Z] Uploads rsync complete
+[2026-08-20T03:00:34Z] Done
+[2026-08-20T04:00:01Z] Starting wiki DB sync
+[2026-08-20T04:00:27Z] DB sync complete
+[2026-08-20T04:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.070 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-20T04:00:34Z] Uploads rsync complete
+[2026-08-20T04:00:34Z] Done
+[2026-08-20T05:00:01Z] Starting wiki DB sync
+error: Internal error occurred: context canceled
+[2026-08-20T05:00:27Z] DB sync complete
+[2026-08-20T05:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,474
+File list generation time: 1.966 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 44
+Total bytes received: 2,161,486
+
+sent 44 bytes  received 2,161,486 bytes  332,543.08 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.15
+[2026-08-20T05:00:33Z] Uploads rsync complete
+[2026-08-20T05:00:33Z] Done
+[2026-08-20T06:00:01Z] Starting wiki DB sync
+[2026-08-20T06:00:29Z] DB sync complete
+[2026-08-20T06:00:29Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,474
+File list generation time: 21.473 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 49
+Total bytes received: 2,161,491
+
+sent 49 bytes  received 2,161,491 bytes  41,172.19 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.10
+[2026-08-20T06:01:22Z] Uploads rsync complete
+[2026-08-20T06:01:22Z] Done
+[2026-08-20T07:00:01Z] Starting wiki DB sync
+[2026-08-20T07:00:28Z] DB sync complete
+[2026-08-20T07:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,474
+File list generation time: 2.295 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 49
+Total bytes received: 2,161,491
+
+sent 49 bytes  received 2,161,491 bytes  332,544.62 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.10
+[2026-08-20T07:00:34Z] Uploads rsync complete
+[2026-08-20T07:00:34Z] Done
+[2026-08-20T08:00:01Z] Starting wiki DB sync
+[2026-08-20T09:00:01Z] Starting wiki DB sync
+[2026-08-20T09:00:27Z] DB sync complete
+[2026-08-20T09:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.036 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  393,003.64 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-20T09:00:33Z] Uploads rsync complete
+[2026-08-20T09:00:33Z] Done
+[2026-08-20T10:00:01Z] Starting wiki DB sync
+[2026-08-20T10:00:28Z] DB sync complete
+[2026-08-20T10:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.077 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-20T10:00:34Z] Uploads rsync complete
+[2026-08-20T10:00:34Z] Done
+[2026-08-20T11:00:01Z] Starting wiki DB sync
+[2026-08-20T11:00:26Z] DB sync complete
+[2026-08-20T11:00:26Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.174 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-20T11:00:32Z] Uploads rsync complete
+[2026-08-20T11:00:32Z] Done
+[2026-08-20T12:00:01Z] Starting wiki DB sync
+error: Internal error occurred: context canceled
+[2026-08-20T12:00:30Z] DB sync complete
+[2026-08-20T12:00:30Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 22.963 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  38,946.31 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-20T12:01:26Z] Uploads rsync complete
+[2026-08-20T12:01:26Z] Done
+[2026-08-20T13:00:01Z] Starting wiki DB sync
+[2026-08-20T13:00:28Z] DB sync complete
+[2026-08-20T13:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.621 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  227,528.42 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-20T13:00:37Z] Uploads rsync complete
+[2026-08-20T13:00:37Z] Done
+[2026-08-20T14:00:01Z] Starting wiki DB sync
+[2026-08-20T14:00:27Z] DB sync complete
+[2026-08-20T14:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.429 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  288,202.67 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-20T14:00:34Z] Uploads rsync complete
+[2026-08-20T14:00:34Z] Done
+[2026-08-20T15:00:01Z] Starting wiki DB sync
+[2026-08-20T15:00:28Z] DB sync complete
+[2026-08-20T15:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.774 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  254,296.47 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-20T15:00:36Z] Uploads rsync complete
+[2026-08-20T15:00:36Z] Done
+[2026-08-20T16:00:01Z] Starting wiki DB sync
+[2026-08-20T17:00:01Z] Starting wiki DB sync
+[2026-08-20T17:00:28Z] DB sync complete
+[2026-08-20T17:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,474
+File list generation time: 2.696 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 44
+Total bytes received: 2,161,486
+
+sent 44 bytes  received 2,161,486 bytes  288,204.00 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.15
+[2026-08-20T17:00:36Z] Uploads rsync complete
+[2026-08-20T17:00:36Z] Done
+[2026-08-20T18:00:01Z] Starting wiki DB sync
+[2026-08-20T18:00:30Z] DB sync complete
+[2026-08-20T18:00:30Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 22.959 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  38,256.99 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-20T18:01:27Z] Uploads rsync complete
+[2026-08-20T18:01:27Z] Done
+[2026-08-20T19:00:01Z] Starting wiki DB sync
+[2026-08-20T19:00:29Z] DB sync complete
+[2026-08-20T19:00:29Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.801 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  254,296.47 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-20T19:00:37Z] Uploads rsync complete
+[2026-08-20T19:00:37Z] Done
+[2026-08-20T20:00:01Z] Starting wiki DB sync
+E0820 20:00:08.382368 2826506 v2.go:150] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0820 20:00:08.384077 2826506 v2.go:129] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0820 20:00:08.382369 2826506 v2.go:167] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+error: error reading from error stream: next reader: local error: tls: bad record MAC
+[2026-08-20T21:00:01Z] Starting wiki DB sync
+[2026-08-20T21:00:27Z] DB sync complete
+[2026-08-20T21:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.407 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-20T21:00:34Z] Uploads rsync complete
+[2026-08-20T21:00:34Z] Done
+[2026-08-20T22:00:01Z] Starting wiki DB sync
+[2026-08-20T22:00:27Z] DB sync complete
+[2026-08-20T22:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.049 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-20T22:00:33Z] Uploads rsync complete
+[2026-08-20T22:00:33Z] Done
+[2026-08-20T23:00:01Z] Starting wiki DB sync
+[2026-08-20T23:00:27Z] DB sync complete
+[2026-08-20T23:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.844 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  288,202.67 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-20T23:00:35Z] Uploads rsync complete
+[2026-08-20T23:00:35Z] Done
+[2026-08-21T00:00:01Z] Starting wiki DB sync
+E0821 00:00:09.617811 3107829 v2.go:129] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0821 00:00:09.617604 3107829 v2.go:167] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0821 00:00:09.618001 3107829 v2.go:150] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+error: error reading from error stream: next reader: local error: tls: bad record MAC
+[2026-08-21T00:00:31Z] DB sync complete
+[2026-08-21T00:00:31Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 21.900 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  37,591.65 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-21T00:01:28Z] Uploads rsync complete
+[2026-08-21T00:01:28Z] Done
+[2026-08-21T01:00:01Z] Starting wiki DB sync
+[2026-08-21T01:00:28Z] DB sync complete
+[2026-08-21T01:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.453 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  288,202.67 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-21T01:00:35Z] Uploads rsync complete
+[2026-08-21T01:00:35Z] Done
+[2026-08-21T02:00:01Z] Starting wiki DB sync
+[2026-08-21T02:00:28Z] DB sync complete
+[2026-08-21T02:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.433 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  288,202.67 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-21T02:00:36Z] Uploads rsync complete
+[2026-08-21T02:00:36Z] Done
+[2026-08-21T03:00:01Z] Starting wiki DB sync
+[2026-08-21T04:00:01Z] Starting wiki DB sync
+[2026-08-21T04:00:28Z] DB sync complete
+[2026-08-21T04:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.030 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-21T04:00:34Z] Uploads rsync complete
+[2026-08-21T04:00:34Z] Done
+[2026-08-21T05:00:01Z] Starting wiki DB sync
+[2026-08-21T05:00:30Z] DB sync complete
+[2026-08-21T05:00:30Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.138 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-21T05:00:36Z] Uploads rsync complete
+[2026-08-21T05:00:36Z] Done
+[2026-08-21T06:00:01Z] Starting wiki DB sync
+[2026-08-21T06:00:30Z] DB sync complete
+[2026-08-21T06:00:30Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 21.972 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  36,949.06 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-21T06:01:29Z] Uploads rsync complete
+[2026-08-21T06:01:29Z] Done
+[2026-08-21T07:00:01Z] Starting wiki DB sync
+E0821 07:00:08.367320 3597236 v2.go:129] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0821 07:00:08.367473 3597236 v2.go:167] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0821 07:00:08.367487 3597236 v2.go:150] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+error: error reading from error stream: next reader: local error: tls: bad record MAC
+[2026-08-21T07:00:27Z] DB sync complete
+[2026-08-21T07:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,474
+File list generation time: 2.205 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 49
+Total bytes received: 2,161,491
+
+sent 49 bytes  received 2,161,491 bytes  332,544.62 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.10
+[2026-08-21T07:00:33Z] Uploads rsync complete
+[2026-08-21T07:00:33Z] Done
+[2026-08-21T08:00:01Z] Starting wiki DB sync
+[2026-08-21T08:00:26Z] DB sync complete
+[2026-08-21T08:00:26Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.540 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  288,202.67 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-21T08:00:33Z] Uploads rsync complete
+[2026-08-21T08:00:33Z] Done
+[2026-08-21T09:00:01Z] Starting wiki DB sync
+[2026-08-21T09:00:29Z] DB sync complete
+[2026-08-21T09:00:29Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.450 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-21T09:00:36Z] Uploads rsync complete
+[2026-08-21T09:00:36Z] Done
+[2026-08-21T10:00:01Z] Starting wiki DB sync
+[2026-08-21T10:00:26Z] DB sync complete
+[2026-08-21T10:00:26Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.927 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  288,202.67 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-21T10:00:34Z] Uploads rsync complete
+[2026-08-21T10:00:34Z] Done
+[2026-08-21T11:00:01Z] Starting wiki DB sync
+[2026-08-21T12:00:01Z] Starting wiki DB sync
+[2026-08-21T12:00:30Z] DB sync complete
+[2026-08-21T12:00:30Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 22.614 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  36,949.06 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-21T12:01:29Z] Uploads rsync complete
+[2026-08-21T12:01:29Z] Done
+[2026-08-21T13:00:01Z] Starting wiki DB sync
+[2026-08-21T13:00:28Z] DB sync complete
+[2026-08-21T13:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.235 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-21T13:00:35Z] Uploads rsync complete
+[2026-08-21T13:00:35Z] Done
+[2026-08-21T14:00:01Z] Starting wiki DB sync
+[2026-08-21T14:00:27Z] DB sync complete
+[2026-08-21T14:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,474
+File list generation time: 2.136 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 44
+Total bytes received: 2,161,486
+
+sent 44 bytes  received 2,161,486 bytes  393,005.45 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.15
+[2026-08-21T14:00:33Z] Uploads rsync complete
+[2026-08-21T14:00:33Z] Done
+[2026-08-21T15:00:02Z] Starting wiki DB sync
+E0821 15:00:08.399343 4159471 v2.go:167] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0821 15:00:08.399433 4159471 v2.go:150] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0821 15:00:08.399401 4159471 v2.go:129] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+error: error reading from error stream: next reader: local error: tls: bad record MAC
+[2026-08-21T16:00:01Z] Starting wiki DB sync
+[2026-08-21T16:00:27Z] DB sync complete
+[2026-08-21T16:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,474
+File list generation time: 2.329 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 44
+Total bytes received: 2,161,486
+
+sent 44 bytes  received 2,161,486 bytes  332,543.08 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.15
+[2026-08-21T16:00:34Z] Uploads rsync complete
+[2026-08-21T16:00:34Z] Done
+[2026-08-21T17:00:01Z] Starting wiki DB sync
+[2026-08-21T17:00:27Z] DB sync complete
+[2026-08-21T17:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.307 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-21T17:00:33Z] Uploads rsync complete
+[2026-08-21T17:00:33Z] Done
+[2026-08-21T18:00:01Z] Starting wiki DB sync
+[2026-08-21T18:00:30Z] DB sync complete
+[2026-08-21T18:00:30Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 23.783 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  35,727.60 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-21T18:01:30Z] Uploads rsync complete
+[2026-08-21T18:01:30Z] Done
+[2026-08-21T19:00:01Z] Starting wiki DB sync
+E0821 19:00:09.617405  249061 v2.go:167] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0821 19:00:09.617947  249061 v2.go:150] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0821 19:00:09.617850  249061 v2.go:129] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+error: error reading from error stream: next reader: local error: tls: bad record MAC
+[2026-08-21T20:00:01Z] Starting wiki DB sync
+[2026-08-21T20:00:28Z] DB sync complete
+[2026-08-21T20:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 3.677 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  187,958.26 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-21T20:00:39Z] Uploads rsync complete
+[2026-08-21T20:00:39Z] Done
+[2026-08-21T21:00:01Z] Starting wiki DB sync
+[2026-08-21T21:00:26Z] DB sync complete
+[2026-08-21T21:00:26Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 3.139 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  288,202.67 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-21T21:00:34Z] Uploads rsync complete
+[2026-08-21T21:00:34Z] Done
+[2026-08-21T22:00:01Z] Starting wiki DB sync
+[2026-08-21T22:00:28Z] DB sync complete
+[2026-08-21T22:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.541 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  288,202.67 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-21T22:00:35Z] Uploads rsync complete
+[2026-08-21T22:00:35Z] Done
+[2026-08-21T23:00:01Z] Starting wiki DB sync
+error: Internal error occurred: context canceled
+[2026-08-21T23:00:28Z] DB sync complete
+[2026-08-21T23:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.065 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-21T23:00:34Z] Uploads rsync complete
+[2026-08-21T23:00:34Z] Done
+[2026-08-22T00:00:01Z] Starting wiki DB sync
+[2026-08-22T01:00:01Z] Starting wiki DB sync
+[2026-08-22T01:00:26Z] DB sync complete
+[2026-08-22T01:00:26Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,474
+File list generation time: 2.745 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 49
+Total bytes received: 2,161,491
+
+sent 49 bytes  received 2,161,491 bytes  288,205.33 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.10
+[2026-08-22T01:00:33Z] Uploads rsync complete
+[2026-08-22T01:00:33Z] Done
+[2026-08-22T02:00:01Z] Starting wiki DB sync
+[2026-08-22T02:00:28Z] DB sync complete
+[2026-08-22T02:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 3.045 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  288,202.67 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-22T02:00:36Z] Uploads rsync complete
+[2026-08-22T02:00:36Z] Done
+[2026-08-22T03:00:01Z] Starting wiki DB sync
+[2026-08-22T03:00:30Z] DB sync complete
+[2026-08-22T03:00:30Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 1.988 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  332,541.54 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-22T03:00:37Z] Uploads rsync complete
+[2026-08-22T03:00:37Z] Done
+[2026-08-22T04:00:02Z] Starting wiki DB sync
+error: Internal error occurred: context canceled
+[2026-08-22T05:00:01Z] Starting wiki DB sync
+[2026-08-22T05:00:27Z] DB sync complete
+[2026-08-22T05:00:27Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,474
+File list generation time: 1.922 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 44
+Total bytes received: 2,161,486
+
+sent 44 bytes  received 2,161,486 bytes  393,005.45 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.15
+[2026-08-22T05:00:33Z] Uploads rsync complete
+[2026-08-22T05:00:33Z] Done
+[2026-08-22T06:00:01Z] Starting wiki DB sync
+[2026-08-22T06:00:31Z] DB sync complete
+[2026-08-22T06:00:31Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 25.038 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 42
+Total bytes received: 2,161,488
+
+sent 42 bytes  received 2,161,488 bytes  35,146.83 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.15
+[2026-08-22T06:01:33Z] Uploads rsync complete
+[2026-08-22T06:01:33Z] Done
+[2026-08-22T07:00:02Z] Starting wiki DB sync
+[2026-08-22T07:00:28Z] DB sync complete
+[2026-08-22T07:00:28Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,471
+File list generation time: 2.307 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 37
+Total bytes received: 2,161,483
+
+sent 37 bytes  received 2,161,483 bytes  288,202.67 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.19
+[2026-08-22T07:00:35Z] Uploads rsync complete
+[2026-08-22T07:00:35Z] Done
+[2026-08-22T08:00:01Z] Starting wiki DB sync
+E0822 08:00:09.225735 1167946 v2.go:167] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0822 08:00:09.226221 1167946 v2.go:150] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+E0822 08:00:09.228832 1167946 v2.go:129] "Unhandled Error" err="next reader: local error: tls: bad record MAC"
+error: error reading from error stream: next reader: local error: tls: bad record MAC
+[2026-08-22T08:00:26Z] DB sync complete
+[2026-08-22T08:00:26Z] Starting wiki uploads rsync
+
+Number of files: 38,341 (reg: 38,327, dir: 14)
+Number of created files: 0
+Number of deleted files: 0
+Number of regular files transferred: 0
+Total file size: 20,954,188,399 bytes
+Total transferred file size: 0 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 2,161,474
+File list generation time: 2.211 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 49
+Total bytes received: 2,161,491
+
+sent 49 bytes  received 2,161,491 bytes  332,544.62 bytes/sec
+total size is 20,954,188,399  speedup is 9,694.10
+[2026-08-22T08:00:33Z] Uploads rsync complete
+[2026-08-22T08:00:33Z] Done

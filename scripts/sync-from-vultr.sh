@@ -14,6 +14,20 @@ NAMESPACE="wetfish-prod"
 
 log() { echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] $*"; }
 
+# SAFETY GUARD — this script OVERWRITES production databases with stale
+# old-prod (149.28.239.165) data. It was only valid BEFORE the 2026-08-17
+# DNS cutover; afterwards it silently destroys fresh prod data every run
+# (see docs/incidents/2026-08-22-wiki-db-overwrite.md).
+#
+# Post-cutover, old-prod is frozen rollback-only. Running this without the
+# explicit opt-in flag below is almost certainly a mistake.
+if [[ "${1:-}" != "--force-post-cutover" ]]; then
+  log "REFUSING to run: this pulls STALE data from old-prod and overwrites k3s prod DBs."
+  log "The DNS cutover happened 2026-08-17; old-prod no longer receives updates."
+  log "If you REALLY intend to overwrite prod with stale data, pass --force-post-cutover."
+  exit 1
+fi
+
 # Resolve the wiki-uploads PVC hostPath dynamically (was hardcoded to a stale path)
 uploads_pvc_path() {
   local vol
