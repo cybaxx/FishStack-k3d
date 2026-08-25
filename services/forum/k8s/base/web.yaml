@@ -163,6 +163,9 @@ spec:
         - name: php-config
           mountPath: /usr/local/etc/php-fpm.d/zz-forum-pool.conf
           subPath: php-fpm-pool.conf
+        - name: php-config
+          mountPath: /usr/local/etc/php/conf.d/zz-wetfish-overrides.ini
+          subPath: php-overrides.ini
         - name: wwwroot
           mountPath: /var/www/forum
         - name: appdata
