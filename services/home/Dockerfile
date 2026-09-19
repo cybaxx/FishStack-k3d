@@ -8,3 +8,4 @@ RUN npm run build
 FROM docker.io/nginx:1.25.2-alpine
 
 COPY --from=builder /ui/public_html /usr/share/nginx/html
+COPY ./src/nginx.conf /etc/nginx/nginx.conf
